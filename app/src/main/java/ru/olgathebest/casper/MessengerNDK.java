@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static android.R.attr.port;
-import static ru.olgathebest.casper.MessagingActivity.getMessagingActivity;
+
 
 
 /**
@@ -47,8 +47,9 @@ public void getMsg(java.lang.String sender_id, java.lang.String identifier, byte
     context.runOnUiThread(new Runnable() {
         @Override
         public void run() {
-            TextView txtView = (TextView) ((Activity)context).findViewById(R.id.msg);
-            txtView.setText(mes);
+            //TextView txtView = (TextView) ((Activity)context).findViewById(R.id.msg);
+            context.getMessageAdapter().addMessage(mes, MessageAdapter.DIRECTION_INCOMING);
+           // txtView.setText(mes);
         }
     });
 

@@ -13,15 +13,6 @@
         android:padding="0dip"
         android:divider="@null"
         android:dividerHeight="0dp" android:stackFromBottom="true" tools:listitem="@layout/msg_left"/>
-    <TextView
-        android:id="@+id/msg"
-        android:paddingLeft="40dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:textSize="30sp"
-        android:text="Hello"
-        />
 
     <RelativeLayout
         android:id="@+id/divider"

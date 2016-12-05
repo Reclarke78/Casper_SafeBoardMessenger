@@ -1,21 +1,14 @@
 package ru.olgathebest.casper;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.io.IOException;
-import java.util.ArrayList;
-
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-import static ru.olgathebest.casper.R.id.msg;
 
 
 /**
@@ -24,9 +17,10 @@ import static ru.olgathebest.casper.R.id.msg;
 
 public class MessagingActivity extends Activity {
     public MessengerNDK messengerNDK = MessengerNDK.getMessengerNDK();
-    public static final MessagingActivity messagingActivity = new MessagingActivity();
     private String recipientId;
-    private byte[] testmsg = {'k','l'};
+    private ListView messagesList;
+    public MessageAdapter messageAdapter;
+    private byte[] testmsg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,11 +29,15 @@ public class MessagingActivity extends Activity {
         recipientId = intent.getStringExtra("RECIPIENT_ID");
         Log.d("I am ok","4");
         messengerNDK.setContext(this);
+        messagesList = (ListView) findViewById(R.id.listMessages);
+        messageAdapter = new MessageAdapter(this);
+        messagesList.setAdapter(messageAdapter);
     }
 
     public void sendmsg(View view){
         EditText text = (EditText) findViewById(R.id.messageBodyField);
         testmsg = UTF8.encode(text.getText().toString());
+        messageAdapter.addMessage(text.getText().toString(), MessageAdapter.DIRECTION_OUTGOING);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -53,8 +51,7 @@ public class MessagingActivity extends Activity {
             }
         }).start();
     }
-
-public static MessagingActivity getMessagingActivity(){
-    return messagingActivity;
+public MessageAdapter getMessageAdapter(){
+    return messageAdapter;
 }
 }

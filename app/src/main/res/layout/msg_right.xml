@@ -1,58 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bubble_layout_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="10dp">
-
-    <RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
-        android:layout_marginLeft="10dp">
-        <TextView
-            android:id="@+id/txtSender"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:text=""
-            android:textSize="16sp"
-            android:singleLine="true"
-            android:layout_alignParentRight="true"
-            android:paddingRight="10dp"
-            android:paddingBottom="6dp"
-            android:textColor="@android:color/black" android:textStyle="bold"/>
+    <LinearLayout
+        android:id="@+id/bubble_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/purple_bubble">
 
         <TextView
-            android:id="@+id/txtDate"
-            android:layout_alignParentLeft="true"
-            android:textColor="@color/main_color_green"
+            android:id="@+id/message_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="2dp"
-            android:paddingBottom="6dp"
-            android:textSize="12sp"
-            android:text=""
-            android:layout_alignBottom="@+id/txtSender"
-            />
+            android:maxEms="12"
+            android:layout_gravity="center"
+            android:text="Hi! new message"
+            android:textColor="@android:color/primary_text_light" />
+    </LinearLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtSender"
-            android:layout_alignParentRight="true"
-            android:padding="12dp"
-            android:background="@drawable/chat_bubble_green"
-            >
-
-            <TextView
-                android:id="@+id/txtMessage"
-                android:paddingRight="40dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:textColor="@android:color/white"
-                android:textSize="30sp"
-                android:text="Hello, how are you?"
-                />
-
-        </RelativeLayout>
-    </RelativeLayout>
-</RelativeLayout>
+</LinearLayout>
