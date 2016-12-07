@@ -1,23 +1,43 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/bubble_layout_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
-
+    android:layout_height="wrap_content">
     <LinearLayout
-        android:id="@+id/bubble_layout"
+        android:id="@+id/content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/purple_bubble">
+        android:layout_alignParentRight="true"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/message_text"
+            android:id="@+id/txtInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="30sp"
+            android:layout_gravity="right"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray" />
+
+        <LinearLayout
+            android:id="@+id/contentWithBackground"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxEms="12"
-            android:layout_gravity="center"
-            android:text="Hi! new message"
-            android:textColor="@android:color/primary_text_light" />
-    </LinearLayout>
+            android:layout_gravity="right"
+            android:background="@drawable/in_message_bg"
+            android:paddingLeft="10dp"
+            android:paddingBottom="10dp"
+            android:orientation="vertical">
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/txtMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif-light"
+                android:paddingLeft="5dp"
+                android:text="Hello"
+                android:maxWidth="240dp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>

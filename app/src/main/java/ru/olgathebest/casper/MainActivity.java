@@ -23,7 +23,7 @@ public class MainActivity extends Activity {
     private String login = "patakiph";
     private String pass = "bad girl";
     MessengerNDK messengerNDK = MessengerNDK.getMessengerNDK();
-    private String serverUrl = "192.168.1.2";//"172.20.10.5"; //"93.188.161.205"
+    private String serverUrl = "192.168.1.2";//"192.168.1.2";//"172.20.10.5"; //"93.188.161.205"
     private int serverPort = 5222;
 
     @Override

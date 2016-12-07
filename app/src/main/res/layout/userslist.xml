@@ -13,7 +13,8 @@
         android:background="@color/main_color_green"
         android:textSize="24sp"
         android:padding="15dp"
-        android:textColor="@color/main_color_gray_dk" />
+        android:textColor="@color/main_color_gray_dk"
+        android:onClick="disconnect"/>
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

@@ -38,6 +38,7 @@ public class MessagingActivity extends Activity {
         EditText text = (EditText) findViewById(R.id.messageBodyField);
         testmsg = UTF8.encode(text.getText().toString());
         messageAdapter.addMessage(text.getText().toString(), MessageAdapter.DIRECTION_OUTGOING);
+        text.setText("");
         new Thread(new Runnable() {
             @Override
             public void run() {

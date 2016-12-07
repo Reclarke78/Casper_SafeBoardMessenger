@@ -39,26 +39,33 @@ public :
     }
 
     void OnOperationResult(operation_result::Type result) override {
-        switch (result) {
-            case operation_result::Type::Ok:
-                code_result = 0;
-                break;
-            case operation_result::Type::AuthError:
-                code_result = 1;
-                break;
-            case operation_result::Type::NetworkError:
-                code_result = 2;
-                break;
-            case operation_result::Type::InternalError:
-                code_result = 3;
-                break;
-            default:
-                code_result = -1;
-        }
+       code_result = result;
     }
 
+//    void OnOperationResult(operation_result::Type result, const UserList &users) override {
+//        user_list.set_value(users);
+//    }
     void OnOperationResult(operation_result::Type result, const UserList &users) override {
-        user_list.set_value(users);
+            mJvm->AttachCurrentThread(&mEnv, NULL);
+            jclass thisClass = mEnv->GetObjectClass(mObj);
+            jmethodID method = mEnv->GetMethodID(thisClass, "getUserList", "([B[I)V");
+            unsigned int len = 0;
+            for (int i = 0; i < users.size(); i++) {
+                len += users[i].identifier.length();
+            }
+            jbyteArray userslist = mEnv->NewByteArray(len);
+            jintArray userslen = mEnv->NewIntArray(users.size());
+            unsigned int start = 0;
+            for (int i = 0; i < users.size(); i++) {
+                unsigned int length = users[i].identifier.length();
+                mEnv->SetByteArrayRegion(userslist, start, users[i].identifier.length(),
+                                         reinterpret_cast<const jbyte *>(&users[i].identifier.c_str()[0]));
+                start += users[i].identifier.length();
+                mEnv->SetIntArrayRegion(userslen,i,1,reinterpret_cast<const jint *>(&length));
+            }
+            mEnv->CallVoidMethod(mObj, method, userslist,userslen);
+            mJvm->DetachCurrentThread();
+
     }
 
     ~Client() {
@@ -83,9 +90,6 @@ public :
         mEnv->CallVoidMethod(mObj, midCallBack, mEnv->NewStringUTF(sender_id.c_str()),
                              mEnv->NewStringUTF(msg.identifier.c_str()), byte_mes);
         mJvm->DetachCurrentThread();
-        //   jclass thisClass = mEnv->FindClass("com/project/messenger/MessengerNDK");
-        // mEnv->CallVoidMethod(mObj, midCallBack,42);
-
     }
 };
 
@@ -136,6 +140,12 @@ JNI_CALL(jobject, nativeUsersList)(JNIEnv *env, jclass caller) {
                                env->NewStringUTF(item.identifier.c_str()));
     }
     return List_obj;
+}
+JNI_CALL(void, nativeTestUserList)(JNIEnv *env, jclass caller){
+    i_mes->RequestActiveUsers(client);
+}
+JNI_CALL(void, nativeDisconnect)(JNIEnv *env, jclass caller){
+    i_mes->Disconnect();
 }
 JNI_CALL(jstring, testJNI)(JNIEnv *env, jobject obj) {
     return env->NewStringUTF("Hello from native code!");
