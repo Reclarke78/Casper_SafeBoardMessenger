@@ -64,7 +64,8 @@
   C:/Android/sdk/ndk-bundle/build//../sources/cxx-stl/llvm-libc++/include\__split_buffer \
   jni/messenger/messenger.h jni/messenger/types.h \
   jni/messenger/callbacks.h jni/messenger/observers.h \
-  jni/messenger/settings.h
+  jni/messenger/settings.h \
+  jni/../../../../../../Android/sdk/ndk-bundle/platforms/android-16/arch-x86/usr/include/android/log.h
 
 C:/Android/sdk/ndk-bundle/build//../sources/cxx-stl/llvm-libc++/include\future:
 
@@ -201,3 +202,5 @@ jni/messenger/callbacks.h:
 jni/messenger/observers.h:
 
 jni/messenger/settings.h:
+
+jni/../../../../../../Android/sdk/ndk-bundle/platforms/android-16/arch-x86/usr/include/android/log.h:

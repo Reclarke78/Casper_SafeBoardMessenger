@@ -15,7 +15,7 @@ import java.io.IOException;
 
 import static android.R.attr.password;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnLogin{
     private Button loginButton;
     private EditText loginField;
     private EditText passField;
@@ -34,6 +34,17 @@ public class MainActivity extends Activity {
         loginField = (EditText) findViewById(R.id.user);
         passField = (EditText) findViewById(R.id.pwd);
     }
+    @Override
+    public void onStart() {
+        super.onStart();
+        messengerNDK.addOnLogin(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        messengerNDK.deleteOnLogin(this);
+    }
 
     public void login(View view) {
         login = loginField.getText().toString();
@@ -44,20 +55,7 @@ public class MainActivity extends Activity {
                 try {
                     messengerNDK.nativeConnect(serverUrl, serverPort);
                     Log.d("I am ok", "0");
-                    if (messengerNDK.nativeLogin(UTF8.encode(login), UTF8.encode(pass)) == 0) {
-                        Log.d("I am ok", "1");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                intent = new Intent(getApplicationContext(), ListUsersActivity.class);
-                                Log.d("I am ok", "2");
-                                startActivity(intent);
-
-                            }
-                        });
-                    }
-
+                    messengerNDK.nativeLogin(UTF8.encode(login), UTF8.encode(pass));
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
@@ -80,4 +78,18 @@ public class MainActivity extends Activity {
         */
     }
 
+    @Override
+    public void onLogin() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                intent = new Intent(getApplicationContext(), ListUsersActivity.class);
+                Log.d("I am ok", "2");
+                startActivity(intent);
+
+            }
+        });
+
+    }
 }

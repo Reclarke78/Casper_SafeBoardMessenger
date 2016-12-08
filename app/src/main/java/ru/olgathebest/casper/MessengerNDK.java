@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Observer;
 
@@ -30,6 +31,7 @@ public class MessengerNDK {
     private boolean security = true;
     private MessagingActivity context;
     private ArrayList<OnUserListChanged> observers = new ArrayList<>();
+    private ArrayList<OnLogin> onLogins = new ArrayList<>();
     private static final MessengerNDK messengerNDK = new MessengerNDK();
 
     static {
@@ -49,13 +51,24 @@ public class MessengerNDK {
         observers.remove(o);
     }
 
+    public void addOnLogin(OnLogin o) {
+        onLogins.add(o);
+    }
+
+    public void deleteOnLogin(OnLogin o) {
+        onLogins.remove(o);
+    }
+
     public void setContext(MessagingActivity context) {
         this.context = context;
     }
 
-    public void getMsg(java.lang.String sender_id, java.lang.String identifier, byte[] msg) {
+    public void getMsg(java.lang.String sender_id, java.lang.String identifier, byte[] msg, long time) {
         final String mes = UTF8.decode(msg);
-        Log.d("msg recieved", "" + mes);
+        Log.d("msg recieved", identifier);
+        Log.d("msg recieved", "" + mes + new Date(time));
+        Message message = new Message(identifier,"",sender_id,mes, new Date(time),StatusMsg.Delivered);
+       // nativeMessageSeen();
         context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -79,6 +92,17 @@ public class MessengerNDK {
 
     }
 
+    public void onMessageStatusChanged(byte[] msgIdArr, int status) {
+        String msgId = UTF8.decode(msgIdArr);
+        Log.d("Status Changed", "" + msgId + " status:" + status);
+    }
+
+    public void onLogin() {
+        for (int i = 0; i < onLogins.size(); i++) {
+            onLogins.get(i).onLogin();
+        }
+    }
+
     public native String testJNI();
 
     public native void nativeTestUserList() throws IOException;
@@ -89,7 +113,9 @@ public class MessengerNDK {
 
     public native void nativeConnect(String url, int port) throws IOException;
 
-    public native ArrayList<String> nativeUsersList() throws IOException;
+  //  public native ArrayList<String> nativeUsersList() throws IOException;
 
-    public native void nativeSend(String userId, byte[] text) throws IOException;
+    public native void nativeSend(byte[] userId, byte[] text) throws IOException;
+
+    public native void nativeMessageSeen(byte[] userId, byte[] msgId);
 }

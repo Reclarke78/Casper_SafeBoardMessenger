@@ -59,6 +59,18 @@ public class ListUsersActivity extends Activity implements OnUserListChanged {
     public void onStart() {
         super.onStart();
         messengerNDK.addObserver(this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("qwer", "1");
+                try {
+                    Log.d("qwer", "2");
+                    messengerNDK.nativeTestUserList();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override

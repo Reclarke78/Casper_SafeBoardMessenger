@@ -44,7 +44,7 @@ public class MessagingActivity extends Activity {
             public void run() {
                 try {
                     Log.d("I am ok","1");
-                    messengerNDK.nativeSend(recipientId,testmsg);
+                    messengerNDK.nativeSend(UTF8.encode(recipientId),testmsg);
                     Log.d("I am ok","2");
                 } catch (IOException e) {
                     e.printStackTrace();
