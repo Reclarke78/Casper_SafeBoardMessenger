@@ -180,6 +180,9 @@ JNI_CALL(void, nativeSend)(JNIEnv *env, jclass caller, jbyteArray recpt,
 //}
 JNI_CALL(void, nativeMessageSeen)(JNIEnv *env, jclass caller, jbyteArray userId,
                                   jbyteArray msg_id) {
+
+    jclass cls = env->GetObjectClass(caller);
+    jmethodID method = env->GetMethodID(cls, "onMessageStatusChanged", "([BI)V");
     jsize userIdSize = env->GetArrayLength(userId);
     jsize msgIdSize = env->GetArrayLength(msg_id);
     messenger::UserId usrId(userIdSize, ' ');
@@ -189,11 +192,13 @@ JNI_CALL(void, nativeMessageSeen)(JNIEnv *env, jclass caller, jbyteArray userId,
     for (jsize i = 0; i < msgIdSize; ++i)
         env->GetByteArrayRegion(msg_id, i, 1, reinterpret_cast<jbyte *>(&msgId[i]));
     i_mes->SendMessageSeen(usrId, msgId);
+    env->CallVoidMethod(caller, method, msg_id, 4);
 }
 JNI_CALL(void, nativeTestUserList)(JNIEnv *env, jclass caller) {
     i_mes->RequestActiveUsers(client);
 }
 JNI_CALL(void, nativeDisconnect)(JNIEnv *env, jclass caller) {
+    i_mes->UnregisterObserver(client);
     i_mes->Disconnect();
 }
 JNI_CALL(jstring, testJNI)(JNIEnv *env, jobject obj) {

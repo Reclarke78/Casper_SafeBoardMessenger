@@ -23,7 +23,7 @@ public class MainActivity extends Activity implements OnLogin{
     private String login = "patakiph";
     private String pass = "bad girl";
     MessengerNDK messengerNDK = MessengerNDK.getMessengerNDK();
-    private String serverUrl = "192.168.1.2";//"192.168.1.2";//"172.20.10.5"; //"93.188.161.205"
+    private String serverUrl = "172.20.10.5";//"192.168.1.2";//"172.20.10.5"; //"93.188.161.205"
     private int serverPort = 5222;
 
     @Override
@@ -85,6 +85,7 @@ public class MainActivity extends Activity implements OnLogin{
             public void run() {
 
                 intent = new Intent(getApplicationContext(), ListUsersActivity.class);
+                intent.putExtra("SENDER_LOGIN",login);
                 Log.d("I am ok", "2");
                 startActivity(intent);
 

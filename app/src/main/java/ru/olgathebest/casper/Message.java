@@ -23,4 +23,37 @@ public Message(String id, String to, String from, String text, Date time, Status
     this.time = time;
     this.status = status;
 }
+    public String getTo(){
+        return this.to;
+    }
+    public void setTo(String to){
+        this.to = to;
+    }
+    public String getFrom(){
+        return this.from;
+    }
+    public void setFrom(String from){
+        this.from = from;
+    }
+    public String getId(){
+        return this.id;
+    }
+    public void setId(String id){
+        this.id = id;
+    }
+    public String getText(){
+        return this.text;
+    }
+    public void setText(String text){
+        this.text = text;
+    }
+    public Date getTime(){
+        return this.time;
+    }
+    public StatusMsg getStatus(){
+        return this.status;
+    }
+    public void setStatus(StatusMsg status){
+        this.status = status;
+    }
 }

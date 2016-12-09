@@ -1,22 +1,13 @@
 package ru.olgathebest.casper;
 
-import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Observer;
+import java.util.HashMap;
 
-import static android.R.attr.port;
-import static ru.olgathebest.casper.R.id.usersListView;
-import static ru.olgathebest.casper.R.layout.userslist;
+import static android.media.CamcorderProfile.get;
 
 
 /**
@@ -30,8 +21,11 @@ public class MessengerNDK {
     private int serverPort = 5222;
     private boolean security = true;
     private MessagingActivity context;
+    private String currentUser;
+    private ArrayList<Message> messages = new ArrayList<>();
     private ArrayList<OnUserListChanged> observers = new ArrayList<>();
     private ArrayList<OnLogin> onLogins = new ArrayList<>();
+    private ArrayList<OnMessageSeen> onMsgSeen = new ArrayList<>();
     private static final MessengerNDK messengerNDK = new MessengerNDK();
 
     static {
@@ -41,6 +35,18 @@ public class MessengerNDK {
 
     public static MessengerNDK getMessengerNDK() {
         return messengerNDK;
+    }
+
+    public ArrayList<Message> getMessages() {
+        return this.messages;
+    }
+
+    public void putMessage(Message msg) {
+        messages.add(msg);
+    }
+
+    public void setCurrentUser(String login) {
+        currentUser = login;
     }
 
     public void addObserver(OnUserListChanged o) {
@@ -59,6 +65,14 @@ public class MessengerNDK {
         onLogins.remove(o);
     }
 
+    public void addOnMsgSeen(OnMessageSeen o) {
+        onMsgSeen.add(o);
+    }
+
+    public void deleteOnMsgSeen(OnMessageSeen o) {
+        onMsgSeen.remove(o);
+    }
+
     public void setContext(MessagingActivity context) {
         this.context = context;
     }
@@ -66,16 +80,22 @@ public class MessengerNDK {
     public void getMsg(java.lang.String sender_id, java.lang.String identifier, byte[] msg, long time) {
         final String mes = UTF8.decode(msg);
         Log.d("msg recieved", identifier);
-        Log.d("msg recieved", "" + mes + new Date(time));
-        Message message = new Message(identifier,"",sender_id,mes, new Date(time),StatusMsg.Delivered);
-       // nativeMessageSeen();
+        Log.d("msg recieved", "from" + sender_id + " text:" + mes + new Date(time));
+        final Message message = new Message(identifier, currentUser, sender_id, mes, new Date(time), StatusMsg.Delivered);
+        putMessage(message);
+        // nativeMessageSeen();
+        if (onMsgSeen.size() == 0) return;
+        for (int i = 0; i < onMsgSeen.size(); i++) {
+            onMsgSeen.get(i).onMessageSeen(message);
+        }
+        Log.d("msg is read", "setting view");
         context.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                context.getMessageAdapter().addMessage(mes, MessageAdapter.DIRECTION_INCOMING);
+                context.getMessageAdapter().addMessage(message, MessageAdapter.DIRECTION_INCOMING);
             }
         });
-
+        Log.d("msg is read", "view changed");
     }
 
     public void getUserList(byte[] users, int[] len) {
@@ -93,8 +113,36 @@ public class MessengerNDK {
     }
 
     public void onMessageStatusChanged(byte[] msgIdArr, int status) {
-        String msgId = UTF8.decode(msgIdArr);
-        Log.d("Status Changed", "" + msgId + " status:" + status);
+        final String msgId = UTF8.decode(msgIdArr);
+        int flag = 0;
+        for (int i = 0; i < messages.size(); i++) {
+            Log.d("msg id",""+messages.get(i).getId());
+            Log.d("status id",""+msgId);
+            if (messages.get(i).getId().equals(msgId)) {
+                messages.get(i).setStatus(StatusMsg.values()[status]);
+                Log.d("Status Changed", "" + msgId + " status:" + status);
+                flag++;
+                if (flag == 2)
+                break;
+            }
+        }
+        for (int i = 0; i < messages.size(); i++) {
+            if (messages.get(i).getId().equals("1")) {
+                messages.get(i).setId(msgId);
+                messages.get(i).setStatus(StatusMsg.values()[status]);
+                Log.d("Status Changed", "" + msgId + "for 1 status:" + status);
+                break;
+            }
+        }
+        //   final int i = k;
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.d("Drowing sent msg", "1");
+                context.getMessageAdapter().notifyDataSetChanged();
+            }
+        });
+
     }
 
     public void onLogin() {
@@ -113,7 +161,7 @@ public class MessengerNDK {
 
     public native void nativeConnect(String url, int port) throws IOException;
 
-  //  public native ArrayList<String> nativeUsersList() throws IOException;
+    //  public native ArrayList<String> nativeUsersList() throws IOException;
 
     public native void nativeSend(byte[] userId, byte[] text) throws IOException;
 
