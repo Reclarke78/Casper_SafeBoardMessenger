@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements OnLogin {
                 startActivity(dbmanager);
             }
         });
-        messengerNDK.setContext(this);
+        messengerNDK.setContext(getApplicationContext());
     }
 
     @Override

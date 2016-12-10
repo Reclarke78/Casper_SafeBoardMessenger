@@ -59,7 +59,7 @@ public class ListUsersActivity extends Activity implements OnUserListChanged {
     @Override
     public void onStart() {
         super.onStart();
-        messengerNDK.addObserver(this);
+        messengerNDK.addOnUserListChanged(this);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -77,7 +77,7 @@ public class ListUsersActivity extends Activity implements OnUserListChanged {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        messengerNDK.deleteObserver(this);
+        messengerNDK.deleteOnUserListChanged(this);
     }
 
     public void userlist(View view) {
