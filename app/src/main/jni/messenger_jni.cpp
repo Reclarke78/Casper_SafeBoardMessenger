@@ -40,11 +40,15 @@ public :
     }
 
     void OnOperationResult(operation_result::Type result) override {
+        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "result %d", result);
         code_result = result;
+        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "1");
         mJvm->AttachCurrentThread(&mEnv, NULL);
         jclass thisClass = mEnv->GetObjectClass(mObj);
-        jmethodID method = mEnv->GetMethodID(thisClass, "onLogin", "()V");
-        mEnv->CallVoidMethod(mObj, method);
+        jmethodID method = mEnv->GetMethodID(thisClass, "onLogin", "(I)V");
+        __android_log_print(ANDROID_LOG_DEBUG, "[C++]","2");
+        mEnv->CallVoidMethod(mObj, method,result);
+        __android_log_print(ANDROID_LOG_DEBUG, "[C++]","3");
         mJvm->DetachCurrentThread();
     }
 
@@ -132,7 +136,7 @@ JNI_CALL(void, nativeConnect)(JNIEnv *env, jclass caller, jstring url, jint port
     const char *login_chars = env->GetStringUTFChars(url, 0);
     client = new Client(login_chars, port, env, caller);
 }
-JNI_CALL(jint, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteArray password) {
+JNI_CALL(void, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteArray password) {
 
     jsize userIdSize = env->GetArrayLength(userId);
     jsize passwordSize = env->GetArrayLength(password);
@@ -144,9 +148,11 @@ JNI_CALL(jint, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteAr
 
     for (jsize i = 0; i < passwordSize; ++i)
         env->GetByteArrayRegion(password, i, 1, reinterpret_cast<jbyte *>(&passwordNew[i]));
+    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "Status START");
     i_mes->RegisterObserver(client);
+    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "Status Login");
     i_mes->Login(userIdNew, passwordNew, policy, client);
-    return code_result;
+    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "Status Login finish");
 }
 
 JNI_CALL(void, nativeSend)(JNIEnv *env, jclass caller, jbyteArray recpt,
@@ -160,24 +166,10 @@ JNI_CALL(void, nativeSend)(JNIEnv *env, jclass caller, jbyteArray recpt,
     jsize size_msg = env->GetArrayLength(text);
     msg.data.resize(size_msg);
     env->GetByteArrayRegion(text, 0, size_msg, reinterpret_cast<jbyte *>(&msg.data[0]));
-    // copy(recpt_str.begin(), recpt_str.end(), back_inserter(msg.data));
     i_mes->SendMessage(recptId, msg);
-    //  env->ReleaseStringUTFChars(recpt, recpt_chars);
+
 }
-//JNI_CALL(jobject, nativeUsersList)(JNIEnv *env, jclass caller) {
-//    UserList list;
-//    i_mes->RequestActiveUsers(client);
-//    list = user_list.get_future().get();
-//    jclass ArrayList_class = env->FindClass("java/util/ArrayList");
-//    jmethodID ArrayList_init_id = env->GetMethodID(ArrayList_class, "<init>", "()V");
-//    jmethodID ArrayList_add_id = env->GetMethodID(ArrayList_class, "add", "(Ljava/lang/Object;)Z");
-//    jobject List_obj = env->NewObject(ArrayList_class, ArrayList_init_id);
-//    for (User item: list) {
-//        env->CallBooleanMethod(List_obj, ArrayList_add_id,
-//                               env->NewStringUTF(item.identifier.c_str()));
-//    }
-//    return List_obj;
-//}
+
 JNI_CALL(void, nativeMessageSeen)(JNIEnv *env, jclass caller, jbyteArray userId,
                                   jbyteArray msg_id) {
 

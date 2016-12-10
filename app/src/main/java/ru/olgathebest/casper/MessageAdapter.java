@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -90,7 +91,7 @@ public class MessageAdapter extends BaseAdapter {
         SimpleDateFormat dt = new SimpleDateFormat("hh:mm");
         txtInfo.setText(dt.format(messages.get(i).first.getTime()));
         Log.d("About to change color ", messages.get(i).first.getStatus().toString());
-        LinearLayout msgBackground = (LinearLayout) convertView.findViewById(R.id.content);
+        RelativeLayout msgBackground = (RelativeLayout) convertView.findViewById(R.id.content);
         if (messages.get(i).first.getStatus() == StatusMsg.Seen) {
             msgBackground.setBackgroundColor(Color.parseColor("#F7F7F7"));
             Log.d("Color changed", "2");

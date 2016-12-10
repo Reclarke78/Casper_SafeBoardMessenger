@@ -51,7 +51,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:layout_margin="4dp"
-            android:background="@drawable/ic_send"
+            android:background="@drawable/ic_send2"
             android:onClick="sendmsg"/>
     </RelativeLayout>
 

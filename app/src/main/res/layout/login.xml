@@ -19,8 +19,8 @@
             <ImageView
                 android:id="@+id/imageView1"
                 android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:src="@drawable/logo_login"
+                android:layout_height="60dp"
+                android:src="@drawable/logo"
                 android:layout_marginBottom="20dp" />
 
             <EditText
@@ -54,6 +54,14 @@
                 android:layout_height="60dp"
                 android:text="@string/log_in"
                 android:onClick="login"
+                />
+            <Button
+                android:id="@+id/db"
+                style="@style/btn_white_large"
+                android:layout_marginTop="5dp"
+                android:layout_width="300dp"
+                android:layout_height="60dp"
+                android:text="Database"
                 />
         </LinearLayout>
 

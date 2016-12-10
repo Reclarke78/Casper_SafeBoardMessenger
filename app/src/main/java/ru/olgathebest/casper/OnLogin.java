@@ -5,5 +5,5 @@ package ru.olgathebest.casper;
  */
 
 public interface OnLogin {
-    void onLogin();
+    void onLogin(int result);
 }

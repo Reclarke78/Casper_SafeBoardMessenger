@@ -1,22 +1,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/content"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:background="#b6d0d2"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/txtInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="30sp"
-            android:layout_gravity="left"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray" />
-
+        >
         <LinearLayout
             android:id="@+id/contentWithBackground"
             android:layout_width="wrap_content"
@@ -26,7 +17,6 @@
             android:paddingLeft="10dp"
             android:paddingBottom="10dp"
             android:orientation="vertical">
-
             <TextView
                 android:id="@+id/txtMessage"
                 android:layout_width="wrap_content"
@@ -37,8 +27,16 @@
                 android:fontFamily="sans-serif-light"
                 android:padding="5dp"
                 android:text="Hello"/>
-
         </LinearLayout>
-
-    </LinearLayout>
+        <TextView
+            android:id="@+id/txtInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="30sp"
+            android:layout_toRightOf="@id/contentWithBackground"
+            android:layout_alignBottom="@id/contentWithBackground"
+            android:layout_marginLeft="5dp"
+            android:textSize="12sp"
+            android:text="time"
+            android:textColor="@android:color/darker_gray" />
+    </RelativeLayout>
 </RelativeLayout>

@@ -49,6 +49,10 @@ public class MessengerNDK {
         currentUser = login;
     }
 
+    public String getCurrentUser() {
+        return currentUser;
+    }
+
     public void addObserver(OnUserListChanged o) {
         observers.add(o);
     }
@@ -81,9 +85,10 @@ public class MessengerNDK {
         final String mes = UTF8.decode(msg);
         Log.d("msg recieved", identifier);
         Log.d("msg recieved", "from" + sender_id + " text:" + mes + new Date(time));
-        final Message message = new Message(identifier, currentUser, sender_id, mes, new Date(time), StatusMsg.Delivered);
+        final Message message = new Message(identifier, currentUser, sender_id, mes, new Date(), StatusMsg.Delivered);
         putMessage(message);
-        // nativeMessageSeen();
+        //вот тут вставляем в бд
+        context.insertMsg(message);
         if (onMsgSeen.size() == 0) return;
         for (int i = 0; i < onMsgSeen.size(); i++) {
             onMsgSeen.get(i).onMessageSeen(message);
@@ -120,6 +125,8 @@ public class MessengerNDK {
             Log.d("status id",""+msgId);
             if (messages.get(i).getId().equals(msgId)) {
                 messages.get(i).setStatus(StatusMsg.values()[status]);
+                //вот тут обновляем id
+                //context.insertMsg(messages.get(i));
                 Log.d("Status Changed", "" + msgId + " status:" + status);
                 flag++;
                 if (flag == 2)
@@ -130,6 +137,8 @@ public class MessengerNDK {
             if (messages.get(i).getId().equals("1")) {
                 messages.get(i).setId(msgId);
                 messages.get(i).setStatus(StatusMsg.values()[status]);
+                //вот тут обновляем id
+                //context.insertMsg(messages.get(i));
                 Log.d("Status Changed", "" + msgId + "for 1 status:" + status);
                 break;
             }
@@ -145,9 +154,10 @@ public class MessengerNDK {
 
     }
 
-    public void onLogin() {
+    public void onLogin(int result) {
+
         for (int i = 0; i < onLogins.size(); i++) {
-            onLogins.get(i).onLogin();
+            onLogins.get(i).onLogin(result);
         }
     }
 
@@ -157,7 +167,7 @@ public class MessengerNDK {
 
     public native void nativeDisconnect() throws IOException;
 
-    public native int nativeLogin(byte[] login, byte[] pwd) throws IOException;
+    public native void nativeLogin(byte[] login, byte[] pwd) throws IOException;
 
     public native void nativeConnect(String url, int port) throws IOException;
 

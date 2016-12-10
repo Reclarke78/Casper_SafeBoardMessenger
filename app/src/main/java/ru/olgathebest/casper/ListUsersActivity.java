@@ -29,26 +29,20 @@ import static ru.olgathebest.casper.R.id.usersListView;
  */
 
 public class ListUsersActivity extends Activity implements OnUserListChanged {
+    public static final String ANOTHER_USER_LOGIN="ANOTHER_USER_LOGIN";
     public MessengerNDK messengerNDK = MessengerNDK.getMessengerNDK();
-    TextView textView;
-    String[] users;
-    String senderId;
     private ListView usersListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.userslist);
-        Intent intent = getIntent();
-        senderId = intent.getStringExtra("SENDER_LOGIN");
-        messengerNDK.setCurrentUser(senderId);
         usersListView = (ListView) findViewById(R.id.usersListView);
     }
 
     public void openConversation(String[] names, int i) {
         Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
-        intent.putExtra("RECIPIENT_ID", names[i]);
-        intent.putExtra("SENDER_LOGIN",senderId);
+        intent.putExtra(ANOTHER_USER_LOGIN, names[i]);
         startActivity(intent);
     }
 
@@ -58,6 +52,8 @@ public class ListUsersActivity extends Activity implements OnUserListChanged {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -98,10 +94,8 @@ public class ListUsersActivity extends Activity implements OnUserListChanged {
                 }
             }
         }).start();
+
     }
-
-
-
 
     @Override
     public void onUserListChanged(final String[] users) {
