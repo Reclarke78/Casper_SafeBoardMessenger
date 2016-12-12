@@ -1,7 +1,14 @@
 package ru.olgathebest.casper;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
@@ -16,6 +23,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import static android.R.attr.key;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 import static android.media.CamcorderProfile.get;
 import static ru.olgathebest.casper.R.layout.login;
 import static ru.olgathebest.casper.R.layout.userslist;
@@ -25,19 +33,27 @@ import static ru.olgathebest.casper.R.layout.userslist;
  * Created by Ольга on 28.11.2016.
  */
 
-public class MessengerNDK {
+public class MessengerNDK extends Service {
+
     private Context context;
+    private MainActivity mainActivity = null;
+
     private String currentUser;
+    private String opponentUser;
+    private long idOfSentMsg;
+
     private static DBHelper dbHelper;
     private static Dao dao;
+
     private HashMap<String, String> users;
     private ArrayList<Message> messages = new ArrayList<>();
+
     private ArrayList<OnUserListChanged> onUserListChanged = new ArrayList<>();
     private ArrayList<OnLogin> onLogins = new ArrayList<>();
     private ArrayList<OnMessageSeen> onMsgSeen = new ArrayList<>();
     private ArrayList<OnMessageReceived> onMsgReceived = new ArrayList<>();
     private ArrayList<OnMessageStatusChanged> onMsgStatusChanged = new ArrayList<>();
-    private long idOfSentMsg;
+
     public static RSA rsa = new RSA(1024);
     private AES aes;
     private static final MessengerNDK messengerNDK = new MessengerNDK();
@@ -53,8 +69,8 @@ public class MessengerNDK {
         dbHelper = new DBHelper(context);
         dao = new Dao(dbHelper);
     }
-
-    public void getMsg(java.lang.String sender_id, java.lang.String identifier, byte[] msg, long time) {
+///////////////////////////////////////////CALLBACKS///////////////////////////////////////
+    public void getMsg(java.lang.String sender_id, java.lang.String identifier, byte[] msg, long time, int type) {
         String mes ="";
         if (isSecure(currentUser,sender_id))
         mes = rsa.decrypt(UTF8.decode(msg));
@@ -63,6 +79,12 @@ public class MessengerNDK {
         Log.d("msg recieved", "from" + sender_id + " " + identifier);
         final Message message = new Message(identifier, currentUser, sender_id, mes, new Date(), StatusMsg.Delivered);
         putMessage(message);
+        Log.d("opponent user","" + opponentUser);
+        Log.d("seder_id",""+sender_id);
+        if (opponentUser == null || !sender_id.equals(opponentUser)) {
+            Log.d("seder_id", "" + sender_id);
+            mainActivity.notification(sender_id, mes, true);
+        }
         //вот тут вставляем в бд
         dao.insertMsg(message);
         if (onMsgSeen.size() == 0) return;
@@ -76,8 +98,6 @@ public class MessengerNDK {
     }
 
     public void getUserList(byte[] users, int[] len, byte[] keys, int[] keylen) {
-//        StringBuffer usersdecoded = new StringBuffer(UTF8.decode(users));
-//        StringBuffer keysdecoded = new StringBuffer(UTF8.decode(keys));
         String[] userslist = new String[len.length];
         String[] keylist = new String[len.length];
         int start = 0;
@@ -96,12 +116,6 @@ public class MessengerNDK {
             userslist[i]=UTF8.decode(userId);
             keylist[i] = UTF8.decode(userKey);
         }
-//        for (int i = 0; i < len.length; i++) {
-//            userslist[i] = usersdecoded.substring(start, start + len[i]);
-//            keylist[i] = keysdecoded.substring(startkey, startkey + keylen[i]);
-//            start += len[i];
-//            startkey += keylen[i];
-//        }
         for (int i = 0; i < onUserListChanged.size(); i++) {
             onUserListChanged.get(i).onUserListChanged(userslist, keylist);
         }
@@ -141,13 +155,12 @@ public class MessengerNDK {
             onLogins.get(i).onLogin(result);
         }
     }
+  //////////////////////////////NOTIFICATIONS/////////////////////////////
 
+/////////////////////////////ШИФРОВАНИЕ////////////////////////////////////////
     public BigInteger getPublicKey() {
         return rsa.getN();
     }
-
-
-
 
     public boolean isSecure(String opponentUserId, String currentUserId){
         return (messengerNDK.getUserPublicKey(opponentUserId).length() > 1 && messengerNDK.getUserPublicKey(currentUserId).length() > 1);
@@ -170,6 +183,12 @@ public class MessengerNDK {
 
 
     ///////////////////////////////ШЛАК////////////////////////////////
+    public void setMainActivity(MainActivity mainActivity){
+        this.mainActivity = mainActivity;
+    }
+    public void setOpponentUser(String user){
+        this.opponentUser = user;
+    }
     public void setUsers(HashMap<String, String> users) {
         this.users = users;
     }
@@ -244,5 +263,11 @@ public class MessengerNDK {
 
     public void deleteOnMsgStatusChanged(OnMessageStatusChanged o) {
         onMsgStatusChanged.remove(o);
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }

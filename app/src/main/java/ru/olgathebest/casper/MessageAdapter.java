@@ -92,8 +92,12 @@ public class MessageAdapter extends BaseAdapter {
         txtInfo.setText(dt.format(messages.get(i).first.getTime()));
         Log.d("About to change color ", messages.get(i).first.getStatus().toString());
         RelativeLayout msgBackground = (RelativeLayout) convertView.findViewById(R.id.content);
-        if (messages.get(i).first.getStatus() == StatusMsg.Seen) {
+        if (messages.get(i).first.getStatus()==StatusMsg.Seen) {
             msgBackground.setBackgroundColor(Color.parseColor("#F7F7F7"));
+            Log.d("Color changed", "2");
+        }
+        if (messages.get(i).first.getStatus()==StatusMsg.Delivered) {
+            msgBackground.setBackgroundColor(Color.parseColor("#B6D0D2"));
             Log.d("Color changed", "2");
         }
         return convertView;

@@ -109,7 +109,7 @@ public class ListUsersActivity extends Activity implements OnUserListChanged {
 
     @Override
     public void onUserListChanged(final String[] users, final String[] keys) {
-       Log.d("KEYS",""+publicKey.equals(keys[0]));
+        Log.d("KEYS", "" + publicKey.equals(keys[0]));
         HashMap<String, String> userlist = new HashMap<>();
         for (int i = 0; i < users.length; i++) {
             userlist.put(users[i], keys[i]);
@@ -168,6 +168,10 @@ public class ListUsersActivity extends Activity implements OnUserListChanged {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        System.exit(0);
+    }
 }
 
 

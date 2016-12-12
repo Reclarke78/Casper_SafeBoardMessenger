@@ -29,7 +29,7 @@ import static ru.olgathebest.casper.R.id.db;
 
 public class MessagingActivity extends Activity implements OnMessageSeen, OnMessageReceived, OnMessageStatusChanged {
     public MessengerNDK messengerNDK = MessengerNDK.getMessengerNDK();
-    private String opponentUserId;
+    public String opponentUserId;
     private String currentUserId;
     private EditText messageText;
     private ListView messagesList;
@@ -44,13 +44,14 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
         Intent intent = getIntent();
         opponentUserId = intent.getStringExtra(ListUsersActivity.ANOTHER_USER_LOGIN);
         currentUserId = messengerNDK.getCurrentUser();
+        messengerNDK.setOpponentUser(opponentUserId);
         // messengerNDK.setContext(this);
         messageText = (EditText) findViewById(R.id.messageBodyField);
         messagesList = (ListView) findViewById(R.id.listMessages);
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
         loadHistory();
-        if (messengerNDK.isSecure(opponentUserId,currentUserId)){
+        if (messengerNDK.isSecure(opponentUserId, currentUserId)) {
             Toast toast = Toast.makeText(getApplicationContext(),
                     "Use only English!", Toast.LENGTH_SHORT);
             toast.show();
@@ -66,6 +67,12 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        opponentUserId = null;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         messengerNDK.deleteOnMsgSeen(this);
@@ -77,7 +84,7 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
     public void sendmsg(View view) {
         //здесь нужны условия, что юзер секюрный
         String enc;
-        if (messengerNDK.isSecure(opponentUserId,currentUserId)) {
+        if (messengerNDK.isSecure(opponentUserId, currentUserId)) {
             enc = rsa.encrypt(messageText.getText().toString(), new BigInteger(messengerNDK.getUserPublicKey(opponentUserId)));//messengerNDK.getUserPublicKey(opponentUserId));
             encodedMsg = UTF8.encode(enc);
 
@@ -116,8 +123,14 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
                             for (int i = 0; i < messages.size(); i++) {
                                 if (messages.get(i).getFrom().equals(currentUserId) && messages.get(i).getTo().equals(opponentUserId))
                                     messageAdapter.addMessage(messages.get(i), MessageAdapter.DIRECTION_OUTGOING);
-                                else if (messages.get(i).getFrom().equals(opponentUserId) && messages.get(i).getTo().equals(currentUserId))
+                                else if (messages.get(i).getFrom().equals(opponentUserId) && messages.get(i).getTo().equals(currentUserId)) {
+                                    if (messages.get(i).getStatus() != StatusMsg.Seen) {
+                                        messages.get(i).setStatus(StatusMsg.Seen);
+                                        onMessageSeen(messages.get(i));
+                                        messengerNDK.getDao().updateMsg(messages.get(i));
+                                    }
                                     messageAdapter.addMessage(messages.get(i), MessageAdapter.DIRECTION_INCOMING);
+                                }
                             }
                     }
                 });

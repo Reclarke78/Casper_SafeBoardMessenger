@@ -135,6 +135,7 @@ public :
         mJvm->AttachCurrentThread(&mEnv, NULL);
         jclass thisClass = mEnv->GetObjectClass(mObj);
         long time = msg.time;
+        int type = msg.content.type;
         unsigned int len = msg.content.data.size();
         // unsigned int idLen = msg.identifier.size();
         const jbyte *text = reinterpret_cast<const jbyte *>(&msg.content.data[0]);
@@ -144,9 +145,9 @@ public :
         mEnv->SetByteArrayRegion(byte_mes, 0, len, text);
         // mEnv->SetByteArrayRegion(byte_id, 0, idLen, id);
         jmethodID midCallBack = mEnv->GetMethodID(thisClass, "getMsg",
-                                                  "(Ljava/lang/String;Ljava/lang/String;[BJ)V");
+                                                  "(Ljava/lang/String;Ljava/lang/String;[BJI)V");
         mEnv->CallVoidMethod(mObj, midCallBack, mEnv->NewStringUTF(sender_id.c_str()),
-                             mEnv->NewStringUTF(msg.identifier.c_str()), byte_mes, time);
+                             mEnv->NewStringUTF(msg.identifier.c_str()), byte_mes, time,type);
         mJvm->DetachCurrentThread();
     }
 };
