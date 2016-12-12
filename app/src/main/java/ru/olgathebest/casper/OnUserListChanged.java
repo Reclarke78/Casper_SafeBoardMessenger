@@ -7,5 +7,5 @@ import java.util.Observer;
  */
 
 public interface OnUserListChanged {
-    void onUserListChanged(final String [] users);
+    void onUserListChanged(final String [] users, String [] keys);
 }

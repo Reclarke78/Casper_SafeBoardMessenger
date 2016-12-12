@@ -5,13 +5,20 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import static android.R.attr.key;
 import static android.media.CamcorderProfile.get;
+import static ru.olgathebest.casper.R.layout.login;
+import static ru.olgathebest.casper.R.layout.userslist;
 
 
 /**
@@ -23,6 +30,7 @@ public class MessengerNDK {
     private String currentUser;
     private static DBHelper dbHelper;
     private static Dao dao;
+    private HashMap<String, String> users;
     private ArrayList<Message> messages = new ArrayList<>();
     private ArrayList<OnUserListChanged> onUserListChanged = new ArrayList<>();
     private ArrayList<OnLogin> onLogins = new ArrayList<>();
@@ -30,6 +38,8 @@ public class MessengerNDK {
     private ArrayList<OnMessageReceived> onMsgReceived = new ArrayList<>();
     private ArrayList<OnMessageStatusChanged> onMsgStatusChanged = new ArrayList<>();
     private long idOfSentMsg;
+    public static RSA rsa = new RSA(1024);
+    private AES aes;
     private static final MessengerNDK messengerNDK = new MessengerNDK();
 
     static {
@@ -45,7 +55,11 @@ public class MessengerNDK {
     }
 
     public void getMsg(java.lang.String sender_id, java.lang.String identifier, byte[] msg, long time) {
-        final String mes = UTF8.decode(msg);
+        String mes ="";
+        if (isSecure(currentUser,sender_id))
+        mes = rsa.decrypt(UTF8.decode(msg));
+        else
+        mes = UTF8.decode(msg);
         Log.d("msg recieved", "from" + sender_id + " " + identifier);
         final Message message = new Message(identifier, currentUser, sender_id, mes, new Date(), StatusMsg.Delivered);
         putMessage(message);
@@ -61,16 +75,35 @@ public class MessengerNDK {
         Log.d("msg is read", "view changed");
     }
 
-    public void getUserList(byte[] users, int[] len) {
-        StringBuffer usersdecoded = new StringBuffer(UTF8.decode(users));
+    public void getUserList(byte[] users, int[] len, byte[] keys, int[] keylen) {
+//        StringBuffer usersdecoded = new StringBuffer(UTF8.decode(users));
+//        StringBuffer keysdecoded = new StringBuffer(UTF8.decode(keys));
         String[] userslist = new String[len.length];
+        String[] keylist = new String[len.length];
         int start = 0;
-        for (int i = 0; i < len.length; i++) {
-            userslist[i] = usersdecoded.substring(start, start + len[i]);
+        int startkey = 0;
+        for (int i = 0; i < len.length; ++i) {
+            byte[] userId = new byte[len[i]];
+            byte[] userKey = new byte[keylen[i]];
+            for (int j = 0; j < userId.length; ++j) {
+                userId[j] = users[start + j];
+            }
+            for (int j = 0; j < userKey.length; ++j) {
+                userKey[j] = keys[startkey + j];
+            }
             start += len[i];
+            startkey+=keylen[i];
+            userslist[i]=UTF8.decode(userId);
+            keylist[i] = UTF8.decode(userKey);
         }
+//        for (int i = 0; i < len.length; i++) {
+//            userslist[i] = usersdecoded.substring(start, start + len[i]);
+//            keylist[i] = keysdecoded.substring(startkey, startkey + keylen[i]);
+//            start += len[i];
+//            startkey += keylen[i];
+//        }
         for (int i = 0; i < onUserListChanged.size(); i++) {
-            onUserListChanged.get(i).onUserListChanged(userslist);
+            onUserListChanged.get(i).onUserListChanged(userslist, keylist);
         }
     }
 
@@ -92,7 +125,7 @@ public class MessengerNDK {
             if (messages.get(i).getId().equals("1")) {
                 messages.get(i).setId(msgId);
                 messages.get(i).setStatus(StatusMsg.values()[status]);
-                dao.updateMsgById(messages.get(i),idOfSentMsg);
+                dao.updateMsgById(messages.get(i), idOfSentMsg);
                 //вот тут обновляем id и status
                 Log.d("Status Changed", "" + msgId + "for 1 status:" + status);
                 break;
@@ -109,6 +142,16 @@ public class MessengerNDK {
         }
     }
 
+    public BigInteger getPublicKey() {
+        return rsa.getN();
+    }
+
+
+
+
+    public boolean isSecure(String opponentUserId, String currentUserId){
+        return (messengerNDK.getUserPublicKey(opponentUserId).length() > 1 && messengerNDK.getUserPublicKey(currentUserId).length() > 1);
+    }
     ////////////////////////////NATIVE/////////////////////////////////
 
     public native String testJNI();
@@ -117,7 +160,7 @@ public class MessengerNDK {
 
     public native void nativeDisconnect() throws IOException;
 
-    public native void nativeLogin(byte[] login, byte[] pwd) throws IOException;
+    public native void nativeLogin(byte[] login, byte[] pwd, byte[] key) throws IOException;
 
     public native void nativeConnect(String url, int port) throws IOException;
 
@@ -127,11 +170,22 @@ public class MessengerNDK {
 
 
     ///////////////////////////////ШЛАК////////////////////////////////
+    public void setUsers(HashMap<String, String> users) {
+        this.users = users;
+    }
 
-    public  void setIdOfSentMsg(long id){
+    public String getUserPublicKey(String login) {
+        return users.get(login);
+    }
+
+    public void setIdOfSentMsg(long id) {
         idOfSentMsg = id;
     }
-    public Dao getDao(){return this.dao;}
+
+    public Dao getDao() {
+        return this.dao;
+    }
+
     public static MessengerNDK getMessengerNDK() {
         return messengerNDK;
     }

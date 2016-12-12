@@ -10,13 +10,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static android.R.id.message;
+import static ru.olgathebest.casper.MessengerNDK.rsa;
 import static ru.olgathebest.casper.R.id.db;
 
 
@@ -47,6 +50,11 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
         messageAdapter = new MessageAdapter(this);
         messagesList.setAdapter(messageAdapter);
         loadHistory();
+        if (messengerNDK.isSecure(opponentUserId,currentUserId)){
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Use only English!", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     @Override
@@ -67,7 +75,14 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
 
 
     public void sendmsg(View view) {
-        encodedMsg = UTF8.encode(messageText.getText().toString());
+        //здесь нужны условия, что юзер секюрный
+        String enc;
+        if (messengerNDK.isSecure(opponentUserId,currentUserId)) {
+            enc = rsa.encrypt(messageText.getText().toString(), new BigInteger(messengerNDK.getUserPublicKey(opponentUserId)));//messengerNDK.getUserPublicKey(opponentUserId));
+            encodedMsg = UTF8.encode(enc);
+
+        } else
+            encodedMsg = UTF8.encode(messageText.getText().toString());
         Message msg = new Message("1", opponentUserId, currentUserId, messageText.getText().toString(), new Date(), StatusMsg.Sending);
         messengerNDK.putMessage(msg);
         messengerNDK.setIdOfSentMsg(messengerNDK.getDao().insertMsg(msg));
@@ -90,6 +105,7 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
         //ArrayList<Message> messages = null;
         new Thread(new Runnable() {
             ArrayList<Message> messages = null;
+
             @Override
             public void run() {
                 messages = (ArrayList<Message>) messengerNDK.getDao().getAllWhere(currentUserId, opponentUserId);

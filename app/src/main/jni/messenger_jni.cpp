@@ -42,13 +42,10 @@ public :
     void OnOperationResult(operation_result::Type result) override {
         __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "result %d", result);
         code_result = result;
-        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "1");
         mJvm->AttachCurrentThread(&mEnv, NULL);
         jclass thisClass = mEnv->GetObjectClass(mObj);
         jmethodID method = mEnv->GetMethodID(thisClass, "onLogin", "(I)V");
-        __android_log_print(ANDROID_LOG_DEBUG, "[C++]","2");
         mEnv->CallVoidMethod(mObj, method,result);
-        __android_log_print(ANDROID_LOG_DEBUG, "[C++]","3");
         mJvm->DetachCurrentThread();
     }
 
@@ -58,22 +55,45 @@ public :
     void OnOperationResult(operation_result::Type result, const UserList &users) override {
         mJvm->AttachCurrentThread(&mEnv, NULL);
         jclass thisClass = mEnv->GetObjectClass(mObj);
-        jmethodID method = mEnv->GetMethodID(thisClass, "getUserList", "([B[I)V");
+        jmethodID method = mEnv->GetMethodID(thisClass, "getUserList", "([B[I[B[I)V");
         unsigned int len = 0;
+        unsigned int keyLen = 0;
         for (int i = 0; i < users.size(); i++) {
             len += users[i].identifier.length();
+            keyLen+=users[i].securityPolicy.encryptionPubKey.size();
         }
+       // __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "len = %d; keyLen = %d",len,keyLen);
+        jbyteArray keylist = mEnv->NewByteArray(keyLen);
         jbyteArray userslist = mEnv->NewByteArray(len);
         jintArray userslen = mEnv->NewIntArray(users.size());
+        jintArray keyslen = mEnv->NewIntArray(users.size());
         unsigned int start = 0;
+        unsigned int startkey = 0;
         for (int i = 0; i < users.size(); i++) {
             unsigned int length = users[i].identifier.length();
             mEnv->SetByteArrayRegion(userslist, start, users[i].identifier.length(),
                                      reinterpret_cast<const jbyte *>(&users[i].identifier.c_str()[0]));
+            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "login: %s",users[i].identifier.c_str());
+            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "length: %d",users[i].identifier.length());
             start += users[i].identifier.length();
+            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "start = %d",start);
             mEnv->SetIntArrayRegion(userslen, i, 1, reinterpret_cast<const jint *>(&length));
+
+            int size = users[i].securityPolicy.encryptionPubKey.size();
+            string str = string(begin(users[i].securityPolicy.encryptionPubKey), end(users[i].securityPolicy.encryptionPubKey));
+            __android_log_print(ANDROID_LOG_DEBUG, "[C++]","%s", str.c_str());
+            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "size[%d] = %d",i,size);
+            if (size > 0) {
+                __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "I am inside");
+                mEnv->SetByteArrayRegion(keylist, startkey, size,
+                                         reinterpret_cast<const jbyte *>(&users[i].securityPolicy.encryptionPubKey[0]));
+            }
+            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "I am outside");
+                mEnv->SetIntArrayRegion(keyslen, i, 1, reinterpret_cast<const jint *>(&size));
+            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "I am dead");
+            startkey += size;
         }
-        mEnv->CallVoidMethod(mObj, method, userslist, userslen);
+        mEnv->CallVoidMethod(mObj, method, userslist, userslen, keylist,keyslen);
         mJvm->DetachCurrentThread();
 
     }
@@ -136,11 +156,20 @@ JNI_CALL(void, nativeConnect)(JNIEnv *env, jclass caller, jstring url, jint port
     const char *login_chars = env->GetStringUTFChars(url, 0);
     client = new Client(login_chars, port, env, caller);
 }
-JNI_CALL(void, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteArray password) {
+JNI_CALL(void, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteArray password, jbyteArray publicKey) {
 
     jsize userIdSize = env->GetArrayLength(userId);
     jsize passwordSize = env->GetArrayLength(password);
+    jsize keySize = env->GetArrayLength(publicKey);
+    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "keSize = %d", keySize);
     messenger::SecurityPolicy policy;
+    if (keySize > 1){
+        policy.encryptionAlgo = encryption_algorithm::Type::RSA_1024;
+    } else {
+        policy.encryptionAlgo = encryption_algorithm::Type::None;
+    }
+    policy.encryptionPubKey.resize(keySize);
+    env->GetByteArrayRegion(publicKey, 0, keySize, reinterpret_cast<jbyte *>(&policy.encryptionPubKey[0]));
     messenger::UserId userIdNew(userIdSize, ' ');
     std::string passwordNew(passwordSize, ' ');
     for (jsize i = 0; i < userIdSize; ++i)
@@ -148,11 +177,8 @@ JNI_CALL(void, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteAr
 
     for (jsize i = 0; i < passwordSize; ++i)
         env->GetByteArrayRegion(password, i, 1, reinterpret_cast<jbyte *>(&passwordNew[i]));
-    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "Status START");
     i_mes->RegisterObserver(client);
-    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "Status Login");
     i_mes->Login(userIdNew, passwordNew, policy, client);
-    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "Status Login finish");
 }
 
 JNI_CALL(void, nativeSend)(JNIEnv *env, jclass caller, jbyteArray recpt,

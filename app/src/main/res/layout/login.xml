@@ -55,6 +55,13 @@
                 android:text="@string/log_in"
                 android:onClick="login"
                 />
+            <CheckBox
+                android:id="@+id/security"
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="I am secure"
+                android:checked="true"/>
             <Button
                 android:id="@+id/db"
                 style="@style/btn_white_large"
@@ -62,6 +69,7 @@
                 android:layout_width="300dp"
                 android:layout_height="60dp"
                 android:text="Database"
+                android:visibility="invisible"
                 />
         </LinearLayout>
 
