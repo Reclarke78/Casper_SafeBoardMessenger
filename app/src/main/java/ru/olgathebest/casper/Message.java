@@ -15,6 +15,7 @@ public class Message {
     private String text;
     private Date time; //время когда отправили
     private StatusMsg status;
+    private String type = "0";
 public Message(String id, String to, String from, String text, Date time, StatusMsg status){
     this.to = to;
     this.id = id;
@@ -23,6 +24,12 @@ public Message(String id, String to, String from, String text, Date time, Status
     this.time = time;
     this.status = status;
 }
+    public String getType(){
+        return this.type;
+    }
+    public void setType(String type){
+        this.type = type;
+    }
     public String getTo(){
         return this.to;
     }

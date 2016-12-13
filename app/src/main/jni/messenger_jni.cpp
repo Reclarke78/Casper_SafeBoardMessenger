@@ -40,12 +40,11 @@ public :
     }
 
     void OnOperationResult(operation_result::Type result) override {
-        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "result %d", result);
         code_result = result;
         mJvm->AttachCurrentThread(&mEnv, NULL);
         jclass thisClass = mEnv->GetObjectClass(mObj);
         jmethodID method = mEnv->GetMethodID(thisClass, "onLogin", "(I)V");
-        mEnv->CallVoidMethod(mObj, method,result);
+        mEnv->CallVoidMethod(mObj, method, result);
         mJvm->DetachCurrentThread();
     }
 
@@ -60,9 +59,9 @@ public :
         unsigned int keyLen = 0;
         for (int i = 0; i < users.size(); i++) {
             len += users[i].identifier.length();
-            keyLen+=users[i].securityPolicy.encryptionPubKey.size();
+            keyLen += users[i].securityPolicy.encryptionPubKey.size();
         }
-       // __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "len = %d; keyLen = %d",len,keyLen);
+        // __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "len = %d; keyLen = %d",len,keyLen);
         jbyteArray keylist = mEnv->NewByteArray(keyLen);
         jbyteArray userslist = mEnv->NewByteArray(len);
         jintArray userslen = mEnv->NewIntArray(users.size());
@@ -73,27 +72,20 @@ public :
             unsigned int length = users[i].identifier.length();
             mEnv->SetByteArrayRegion(userslist, start, users[i].identifier.length(),
                                      reinterpret_cast<const jbyte *>(&users[i].identifier.c_str()[0]));
-            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "login: %s",users[i].identifier.c_str());
-            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "length: %d",users[i].identifier.length());
             start += users[i].identifier.length();
-            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "start = %d",start);
             mEnv->SetIntArrayRegion(userslen, i, 1, reinterpret_cast<const jint *>(&length));
 
             int size = users[i].securityPolicy.encryptionPubKey.size();
-            string str = string(begin(users[i].securityPolicy.encryptionPubKey), end(users[i].securityPolicy.encryptionPubKey));
-            __android_log_print(ANDROID_LOG_DEBUG, "[C++]","%s", str.c_str());
-            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "size[%d] = %d",i,size);
+            string str = string(begin(users[i].securityPolicy.encryptionPubKey),
+                                end(users[i].securityPolicy.encryptionPubKey));
             if (size > 0) {
-                __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "I am inside");
                 mEnv->SetByteArrayRegion(keylist, startkey, size,
                                          reinterpret_cast<const jbyte *>(&users[i].securityPolicy.encryptionPubKey[0]));
             }
-            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "I am outside");
-                mEnv->SetIntArrayRegion(keyslen, i, 1, reinterpret_cast<const jint *>(&size));
-            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "I am dead");
+            mEnv->SetIntArrayRegion(keyslen, i, 1, reinterpret_cast<const jint *>(&size));
             startkey += size;
         }
-        mEnv->CallVoidMethod(mObj, method, userslist, userslen, keylist,keyslen);
+        mEnv->CallVoidMethod(mObj, method, userslist, userslen, keylist, keyslen);
         mJvm->DetachCurrentThread();
 
     }
@@ -103,14 +95,12 @@ public :
     }
 
     void OnMessageStatusChanged(const MessageId &msg_id, message_status::Type status) override {
-        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "Status START: %d", status);
         JNIEnv *env;
         bool attached = false;
         jint envRes = mJvm->GetEnv((void **) &env, JNI_VERSION_1_6);
         if (envRes == JNI_EDETACHED) {
             mJvm->AttachCurrentThread(&env, NULL);
             attached = true;
-            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "ATTACHED");
         }
 
         jclass cls = env->GetObjectClass(mObj);
@@ -124,10 +114,7 @@ public :
 
         if (attached) {
             mJvm->DetachCurrentThread();
-
-            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "DETACHED");
         }
-        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "Status END: %d", status);
     }
 
     void OnMessageReceived(const UserId &sender_id, const Message &msg) override {
@@ -135,19 +122,29 @@ public :
         mJvm->AttachCurrentThread(&mEnv, NULL);
         jclass thisClass = mEnv->GetObjectClass(mObj);
         long time = msg.time;
-        int type = msg.content.type;
+        long type = 0;
+        if (msg.content.type == message_content_type::Text) {
+            type = 0;
+//            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "RECEIVED! type is text = %d",
+//                                type);
+        }
+        else if (msg.content.type == message_content_type::Image) {
+            type = 1;
+//            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "RECEIVED! type is img = %d",
+//                                type);
+        }
         unsigned int len = msg.content.data.size();
-        // unsigned int idLen = msg.identifier.size();
         const jbyte *text = reinterpret_cast<const jbyte *>(&msg.content.data[0]);
-        // const jbyte *id = reinterpret_cast<const jbyte *>(&msg.identifier[0]);
         jbyteArray byte_mes = mEnv->NewByteArray(len);
-        // jbyteArray byte_id = mEnv->NewByteArray(idLen);
         mEnv->SetByteArrayRegion(byte_mes, 0, len, text);
-        // mEnv->SetByteArrayRegion(byte_id, 0, idLen, id);
         jmethodID midCallBack = mEnv->GetMethodID(thisClass, "getMsg",
-                                                  "(Ljava/lang/String;Ljava/lang/String;[BJI)V");
+                                                  "(Ljava/lang/String;Ljava/lang/String;[BZ)V");
+        if (type == 0)
         mEnv->CallVoidMethod(mObj, midCallBack, mEnv->NewStringUTF(sender_id.c_str()),
-                             mEnv->NewStringUTF(msg.identifier.c_str()), byte_mes, time,type);
+                             mEnv->NewStringUTF(msg.identifier.c_str()), byte_mes, 0);
+        else
+            mEnv->CallVoidMethod(mObj, midCallBack, mEnv->NewStringUTF(sender_id.c_str()),
+                                 mEnv->NewStringUTF(msg.identifier.c_str()), byte_mes, 1);
         mJvm->DetachCurrentThread();
     }
 };
@@ -157,20 +154,22 @@ JNI_CALL(void, nativeConnect)(JNIEnv *env, jclass caller, jstring url, jint port
     const char *login_chars = env->GetStringUTFChars(url, 0);
     client = new Client(login_chars, port, env, caller);
 }
-JNI_CALL(void, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteArray password, jbyteArray publicKey) {
+JNI_CALL(void, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteArray password,
+                            jbyteArray publicKey) {
 
     jsize userIdSize = env->GetArrayLength(userId);
     jsize passwordSize = env->GetArrayLength(password);
     jsize keySize = env->GetArrayLength(publicKey);
     __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "keSize = %d", keySize);
     messenger::SecurityPolicy policy;
-    if (keySize > 1){
+    if (keySize > 1) {
         policy.encryptionAlgo = encryption_algorithm::Type::RSA_1024;
     } else {
         policy.encryptionAlgo = encryption_algorithm::Type::None;
     }
     policy.encryptionPubKey.resize(keySize);
-    env->GetByteArrayRegion(publicKey, 0, keySize, reinterpret_cast<jbyte *>(&policy.encryptionPubKey[0]));
+    env->GetByteArrayRegion(publicKey, 0, keySize,
+                            reinterpret_cast<jbyte *>(&policy.encryptionPubKey[0]));
     messenger::UserId userIdNew(userIdSize, ' ');
     std::string passwordNew(passwordSize, ' ');
     for (jsize i = 0; i < userIdSize; ++i)
@@ -183,13 +182,24 @@ JNI_CALL(void, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteAr
 }
 
 JNI_CALL(void, nativeSend)(JNIEnv *env, jclass caller, jbyteArray recpt,
-                           jbyteArray text) { //тут тоже должен быть массив байт
+                           jbyteArray text, jint type) { //тут тоже должен быть массив байт
     jsize userIdSize = env->GetArrayLength(recpt);
     messenger::UserId recptId(userIdSize, ' ');
     for (jsize i = 0; i < userIdSize; ++i)
         env->GetByteArrayRegion(recpt, i, 1, reinterpret_cast<jbyte *>(&recptId[i]));
     MessageContent msg;
-    msg.type = message_content_type::Text;
+    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "type= %d",
+                        type);
+    if (type == 0) {
+        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "type is text = %d",
+                            0);
+        msg.type = message_content_type::Text;
+    }
+    else if (type == 1) {
+        msg.type = message_content_type::Image;
+        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "type is img = %d",
+                            1);
+    }
     jsize size_msg = env->GetArrayLength(text);
     msg.data.resize(size_msg);
     env->GetByteArrayRegion(text, 0, size_msg, reinterpret_cast<jbyte *>(&msg.data[0]));

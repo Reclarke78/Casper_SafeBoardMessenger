@@ -1,6 +1,8 @@
 package ru.olgathebest.casper;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
 import android.util.Pair;
@@ -8,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -19,6 +22,8 @@ import java.util.List;
 import java.util.logging.SimpleFormatter;
 
 import static ru.olgathebest.casper.R.id.content;
+import static ru.olgathebest.casper.R.id.txtInfo;
+import static ru.olgathebest.casper.R.id.txtMessage;
 
 /**
  * Created by Ольга on 05.12.2016.
@@ -85,21 +90,33 @@ public class MessageAdapter extends BaseAdapter {
         }
 
         String message = messages.get(i).first.getText();
+        String type = messages.get(i).first.getType();
+        ImageView image = (ImageView) convertView.findViewById(R.id.imgMessage);
         TextView txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
-        txtMessage.setText(message);
         TextView txtInfo = (TextView) convertView.findViewById(R.id.txtInfo);
-        SimpleDateFormat dt = new SimpleDateFormat("hh:mm");
-        txtInfo.setText(dt.format(messages.get(i).first.getTime()));
-        Log.d("About to change color ", messages.get(i).first.getStatus().toString());
+        if (type.equals("1")) {
+            byte[] bits = UTF8.hexToBytes(messages.get(i).first.getText());
+            Log.d("imageadd", bits.length + "");
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bits, 0, bits.length);
+            //Bitmap bitmap = BitmapFactory.decodeResource(activity.getResources(), R.mipmap.ic_launcher);
+            image.setImageBitmap(bitmap);
+            txtMessage.setText("");
+            SimpleDateFormat dt = new SimpleDateFormat("HH:mm");
+            txtInfo.setText(dt.format(messages.get(i).first.getTime()));
+        } else {
+            image.setImageBitmap(null);
+            txtMessage.setText(message);
+            SimpleDateFormat dt = new SimpleDateFormat("HH:mm");
+            txtInfo.setText(dt.format(messages.get(i).first.getTime()));
+        }
         RelativeLayout msgBackground = (RelativeLayout) convertView.findViewById(R.id.content);
-        if (messages.get(i).first.getStatus()==StatusMsg.Seen) {
+        if (messages.get(i).first.getStatus() == StatusMsg.Seen) {
             msgBackground.setBackgroundColor(Color.parseColor("#F7F7F7"));
-            Log.d("Color changed", "2");
         }
-        if (messages.get(i).first.getStatus()==StatusMsg.Delivered) {
+        if (messages.get(i).first.getStatus() == StatusMsg.Delivered) {
             msgBackground.setBackgroundColor(Color.parseColor("#B6D0D2"));
-            Log.d("Color changed", "2");
         }
+
         return convertView;
     }
 }

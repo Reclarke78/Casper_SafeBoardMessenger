@@ -24,9 +24,10 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String KEY_TIMESTAMP = "timestamp_";
     public static final String KEY_CONTENT_MES = "message_";
     public static final String KEY_STATUS_MES = "status_";
+    public static final String KEY_TYPE = "type_";
 
     private static final String DATABASE_NAME = "myDB";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     public final String TAG = "dataBase";
 
     private static final String CREATE_TABLE = String.format("CREATE TABLE IF NOT EXISTS %s ("
@@ -36,8 +37,9 @@ public class DBHelper extends SQLiteOpenHelper {
             + "%s text,"
             + "%s text,"
             + "%s integer,"
+            + "%s text,"
             + "%s text"
-            + ");", TABLE_NAME, KEY_ID, KEY_ID_MES, KEY_TO, KEY_FROM, KEY_CONTENT_MES, KEY_TIMESTAMP, KEY_STATUS_MES);
+            + ");", TABLE_NAME, KEY_ID, KEY_ID_MES, KEY_TO, KEY_FROM, KEY_CONTENT_MES, KEY_TIMESTAMP, KEY_STATUS_MES, KEY_TYPE);
 
     private static final String DROP_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

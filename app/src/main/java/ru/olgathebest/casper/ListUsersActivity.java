@@ -61,6 +61,7 @@ public class ListUsersActivity extends Activity implements OnUserListChanged {
     public void disconnect(View view) {
         try {
             messengerNDK.nativeDisconnect();
+            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
         }

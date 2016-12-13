@@ -20,6 +20,7 @@ import static ru.olgathebest.casper.DBHelper.KEY_ID_MES;
 import static ru.olgathebest.casper.DBHelper.KEY_STATUS_MES;
 import static ru.olgathebest.casper.DBHelper.KEY_TIMESTAMP;
 import static ru.olgathebest.casper.DBHelper.KEY_TO;
+import static ru.olgathebest.casper.DBHelper.KEY_TYPE;
 import static ru.olgathebest.casper.DBHelper.TABLE_NAME;
 import static ru.olgathebest.casper.R.string.email;
 
@@ -72,11 +73,13 @@ public class Dao {
             int messageColInd = cursor.getColumnIndex(KEY_CONTENT_MES);
             int statusColInd = cursor.getColumnIndex(KEY_STATUS_MES);
             int timestampColInd = cursor.getColumnIndex(KEY_TIMESTAMP);
+            int typeColInd = cursor.getColumnIndex(KEY_TYPE);
             do {
                 Message message = new Message(cursor.getString(idColInd),
                         cursor.getString(toColInd), cursor.getString(fromColInd),
                         cursor.getString(messageColInd), new Date(cursor.getLong(timestampColInd)),
                         StatusMsg.valueOf(cursor.getString(statusColInd)));
+                message.setType(cursor.getString(typeColInd));
                 messages.add(message);
             } while (cursor.moveToNext());
 
@@ -131,5 +134,6 @@ public class Dao {
         cv.put(KEY_CONTENT_MES, message.getText());
         cv.put(KEY_STATUS_MES, message.getStatus().toString());
         cv.put(KEY_TIMESTAMP, message.getTime().getTime());
+        cv.put(KEY_TYPE,message.getType());
     }
 }

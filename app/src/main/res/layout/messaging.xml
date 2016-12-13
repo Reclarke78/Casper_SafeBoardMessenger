@@ -29,8 +29,6 @@
         android:background="@android:color/white"
         android:paddingLeft="10dp"
         android:layout_alignParentBottom="true">
-
-
         <EditText
             android:layout_marginBottom="-4dp"
             android:id="@+id/messageBodyField"
@@ -44,7 +42,14 @@
             android:background="@android:color/white"
             android:layout_alignBottom="@+id/sendButton"
             android:layout_toLeftOf="@+id/sendButton"/>
-
+        <Button
+            android:id="@+id/sendPhoto"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@id/sendButton"
+            android:layout_margin="4dp"
+            android:background="@drawable/ic_send_photo"
+            android:onClick="sendphoto"/>
         <Button
             android:id="@+id/sendButton"
             android:layout_width="40dp"

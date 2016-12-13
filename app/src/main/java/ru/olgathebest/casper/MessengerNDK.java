@@ -7,6 +7,8 @@ import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -70,19 +72,27 @@ public class MessengerNDK extends Service {
         dao = new Dao(dbHelper);
     }
 ///////////////////////////////////////////CALLBACKS///////////////////////////////////////
-    public void getMsg(java.lang.String sender_id, java.lang.String identifier, byte[] msg, long time, int type) {
-        String mes ="";
-        if (isSecure(currentUser,sender_id))
-        mes = rsa.decrypt(UTF8.decode(msg));
-        else
-        mes = UTF8.decode(msg);
-        Log.d("msg recieved", "from" + sender_id + " " + identifier);
-        final Message message = new Message(identifier, currentUser, sender_id, mes, new Date(), StatusMsg.Delivered);
-        putMessage(message);
-        Log.d("opponent user","" + opponentUser);
-        Log.d("seder_id",""+sender_id);
+    public void getMsg(java.lang.String sender_id, java.lang.String identifier, byte[] msg, boolean type) {
+        String mes = "";
+        Message message = null;
+        Log.d("Type", ""+type);
+        if (type==true){
+            mes = UTF8.bytesToHex(msg);
+            message = new Message(identifier, currentUser, sender_id, mes, new Date(), StatusMsg.Delivered);
+            message.setType("1");
+            putMessage(message);
+        } else {
+
+            if (isSecure(currentUser, sender_id)&& type !=true)
+                mes = rsa.decrypt(UTF8.decode(msg));
+            else
+                mes = UTF8.decode(msg);
+            Log.d("msg recieved", "from" + sender_id + " " + identifier);
+            message = new Message(identifier, currentUser, sender_id, mes, new Date(), StatusMsg.Delivered);
+            putMessage(message);
+        }
+
         if (opponentUser == null || !sender_id.equals(opponentUser)) {
-            Log.d("seder_id", "" + sender_id);
             mainActivity.notification(sender_id, mes, true);
         }
         //вот тут вставляем в бд
@@ -155,7 +165,6 @@ public class MessengerNDK extends Service {
             onLogins.get(i).onLogin(result);
         }
     }
-  //////////////////////////////NOTIFICATIONS/////////////////////////////
 
 /////////////////////////////ШИФРОВАНИЕ////////////////////////////////////////
     public BigInteger getPublicKey() {
@@ -177,7 +186,7 @@ public class MessengerNDK extends Service {
 
     public native void nativeConnect(String url, int port) throws IOException;
 
-    public native void nativeSend(byte[] userId, byte[] text) throws IOException;
+    public native void nativeSend(byte[] userId, byte[] text, int type) throws IOException;
 
     public native void nativeMessageSeen(byte[] userId, byte[] msgId);
 
