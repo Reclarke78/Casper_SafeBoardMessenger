@@ -1,6 +1,4 @@
-package ru.olgathebest.casper;
-
-import java.util.Observer;
+package ru.olgathebest.casper.callbacks;
 
 /**
  * Created by Ольга on 06.12.2016.

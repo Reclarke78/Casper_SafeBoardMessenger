@@ -1,37 +1,25 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.activities;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
-import static android.R.id.list;
-import static android.view.View.Z;
-import static ru.olgathebest.casper.R.id.src_over;
-import static ru.olgathebest.casper.R.id.user;
-import static ru.olgathebest.casper.R.id.users;
-import static ru.olgathebest.casper.R.id.usersListView;
+import ru.olgathebest.casper.MessengerNDK;
+import ru.olgathebest.casper.callbacks.OnUserListChanged;
+import ru.olgathebest.casper.R;
 
 /**
  * Created by Ольга on 01.12.2016.

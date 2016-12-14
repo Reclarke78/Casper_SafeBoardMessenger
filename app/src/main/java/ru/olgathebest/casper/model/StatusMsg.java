@@ -1,4 +1,4 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.model;
 
 /**
  * Created by Ольга on 08.12.2016.

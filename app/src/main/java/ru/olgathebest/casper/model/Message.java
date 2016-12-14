@@ -1,4 +1,4 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.model;
 
 import java.util.Date;
 

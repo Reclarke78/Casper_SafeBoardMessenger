@@ -15,11 +15,6 @@ using namespace messenger;
 
 shared_ptr<IMessenger> i_mes;
 
-vector<unsigned char> getPublicKey();
-
-string text_mes = "no";
-int code_result = 0;
-
 class Client : public ILoginCallback, public IMessagesObserver, public IRequestUsersCallback {
 public:
     JavaVM *mJvm;
@@ -28,8 +23,8 @@ public:
 public :
     Client(string url, int port, JNIEnv *env, jobject obj) {
         MessengerSettings settings;
-        settings.serverUrl = url;//"93.188.161.205";
-        settings.serverPort = port;// 5222;
+        settings.serverUrl = url;
+        settings.serverPort = port;
         i_mes = GetMessengerInstance(settings);
         env->GetJavaVM(&mJvm);
         mEnv = env;
@@ -37,7 +32,6 @@ public :
     }
 
     void OnOperationResult(operation_result::Type result) override {
-        code_result = result;
         mJvm->AttachCurrentThread(&mEnv, NULL);
         jclass thisClass = mEnv->GetObjectClass(mObj);
         jmethodID method = mEnv->GetMethodID(thisClass, "onLogin", "(I)V");
@@ -45,9 +39,6 @@ public :
         mJvm->DetachCurrentThread();
     }
 
-//    void OnOperationResult(operation_result::Type result, const UserList &users) override {
-//        user_list.set_value(users);
-//    }
     void OnOperationResult(operation_result::Type result, const UserList &users) override {
         mJvm->AttachCurrentThread(&mEnv, NULL);
         jclass thisClass = mEnv->GetObjectClass(mObj);
@@ -58,7 +49,6 @@ public :
             len += users[i].identifier.length();
             keyLen += users[i].securityPolicy.encryptionPubKey.size();
         }
-        // __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "len = %d; keyLen = %d",len,keyLen);
         jbyteArray keylist = mEnv->NewByteArray(keyLen);
         jbyteArray userslist = mEnv->NewByteArray(len);
         jintArray userslen = mEnv->NewIntArray(users.size());
@@ -122,13 +112,9 @@ public :
         long type = 0;
         if (msg.content.type == message_content_type::Text) {
             type = 0;
-//            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "RECEIVED! type is text = %d",
-//                                type);
         }
         else if (msg.content.type == message_content_type::Image) {
             type = 1;
-//            __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "RECEIVED! type is img = %d",
-//                                type);
         }
         unsigned int len = msg.content.data.size();
         const jbyte *text = reinterpret_cast<const jbyte *>(&msg.content.data[0]);
@@ -157,7 +143,6 @@ JNI_CALL(void, nativeLogin)(JNIEnv *env, jobject obj, jbyteArray userId, jbyteAr
     jsize userIdSize = env->GetArrayLength(userId);
     jsize passwordSize = env->GetArrayLength(password);
     jsize keySize = env->GetArrayLength(publicKey);
-    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "keSize = %d", keySize);
     messenger::SecurityPolicy policy;
     if (keySize > 1) {
         policy.encryptionAlgo = encryption_algorithm::Type::RSA_1024;
@@ -185,17 +170,11 @@ JNI_CALL(void, nativeSend)(JNIEnv *env, jclass caller, jbyteArray recpt,
     for (jsize i = 0; i < userIdSize; ++i)
         env->GetByteArrayRegion(recpt, i, 1, reinterpret_cast<jbyte *>(&recptId[i]));
     MessageContent msg;
-    __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "type= %d",
-                        type);
     if (type == 0) {
-        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "type is text = %d",
-                            0);
         msg.type = message_content_type::Text;
     }
     else if (type == 1) {
         msg.type = message_content_type::Image;
-        __android_log_print(ANDROID_LOG_DEBUG, "[C++]", "type is img = %d",
-                            1);
     }
     jsize size_msg = env->GetArrayLength(text);
     msg.data.resize(size_msg);

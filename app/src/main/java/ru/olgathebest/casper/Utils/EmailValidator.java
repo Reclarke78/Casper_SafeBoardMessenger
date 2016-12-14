@@ -1,4 +1,4 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.utils;
 
 /**
  * Created by Ольга on 12.12.2016.
@@ -7,7 +7,6 @@ package ru.olgathebest.casper;
 import java.util.regex.Matcher;
 
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EmailValidator {
@@ -24,7 +23,6 @@ public class EmailValidator {
 
     public boolean validate(final String hex) {
         matcher = pattern.matcher(hex);
-
         return matcher.matches();
     }
 

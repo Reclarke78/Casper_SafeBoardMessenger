@@ -1,21 +1,7 @@
-package ru.olgathebest.casper;
-
-import org.apache.commons.codec.binary.Base64;
+package ru.olgathebest.casper.utils;
 
 import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-
-import javax.crypto.Cipher;
-
-import static android.R.attr.publicKey;
-import static android.os.Build.VERSION_CODES.N;
 
 /**
  * Created by Ольга on 11.12.2016.
@@ -53,7 +39,7 @@ public class RSA {
     /** Encrypt the given plaintext message. */
 
     public synchronized String encrypt(String message,BigInteger key) {
-        return (new BigInteger(UTF8.encode(message))).modPow(e, key).toString();
+        return (new BigInteger(Coding.encode(message))).modPow(e, key).toString();
     }
 
     /** Decrypt the given ciphertext message. */

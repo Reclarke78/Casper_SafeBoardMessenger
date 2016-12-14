@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,17 +22,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ru.olgathebest.casper.AndroidDatabaseManager"
+            android:name="ru.olgathebest.casper.database.AndroidDatabaseManager"
             android:theme="@style/Theme.AppCompat.Light" />
         <activity
-            android:name=".ListUsersActivity"
+            android:name=".activities.ListUsersActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".MessagingActivity"
+            android:name=".activities.MessagingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MyPreferencesActivity"
+            android:name=".activities.MyPreferencesActivity"
             android:screenOrientation="portrait" />
     </application>
 

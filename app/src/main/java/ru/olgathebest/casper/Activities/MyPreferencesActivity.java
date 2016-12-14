@@ -1,4 +1,4 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.activities;
 
 import android.preference.PreferenceActivity;
 
@@ -6,8 +6,9 @@ import android.preference.PreferenceActivity;
  * Created by Ольга on 14.12.2016.
  */
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
+
+import ru.olgathebest.casper.R;
 
 public class MyPreferencesActivity extends PreferenceActivity {
 

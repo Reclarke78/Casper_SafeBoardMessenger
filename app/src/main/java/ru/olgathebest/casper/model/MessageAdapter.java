@@ -1,4 +1,4 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.model;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -11,19 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.SimpleFormatter;
 
-import static ru.olgathebest.casper.R.id.content;
-import static ru.olgathebest.casper.R.id.txtInfo;
-import static ru.olgathebest.casper.R.id.txtMessage;
+import ru.olgathebest.casper.R;
+import ru.olgathebest.casper.utils.Coding;
 
 /**
  * Created by Ольга on 05.12.2016.
@@ -32,8 +28,6 @@ import static ru.olgathebest.casper.R.id.txtMessage;
 public class MessageAdapter extends BaseAdapter {
     public static final int DIRECTION_INCOMING = 0;
     public static final int DIRECTION_OUTGOING = 1;
-    public static final int READ = 2;
-    public static final int UNREAD = 3;
     private List<Pair<Message, Integer>> messages;
     private LayoutInflater layoutInflater;
 
@@ -96,7 +90,7 @@ public class MessageAdapter extends BaseAdapter {
         TextView txtInfo = (TextView) convertView.findViewById(R.id.txtInfo);
         TextView txtStatus = (TextView) convertView.findViewById(R.id.txtStatus);
         if (type.equals("1")) {
-            byte[] bits = UTF8.hexToBytes(messages.get(i).first.getText());
+            byte[] bits = Coding.hexToBytes(messages.get(i).first.getText());
             Log.d("imageadd", bits.length + "");
             Bitmap bitmap = BitmapFactory.decodeByteArray(bits, 0, bits.length);
             //Bitmap bitmap = BitmapFactory.decodeResource(activity.getResources(), R.mipmap.ic_launcher);

@@ -1,10 +1,7 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.activities;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -22,11 +19,18 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import static android.R.id.message;
+import ru.olgathebest.casper.utils.Coding;
+import ru.olgathebest.casper.model.Message;
+import ru.olgathebest.casper.model.MessageAdapter;
+import ru.olgathebest.casper.MessengerNDK;
+import ru.olgathebest.casper.callbacks.OnMessageReceived;
+import ru.olgathebest.casper.callbacks.OnMessageSeen;
+import ru.olgathebest.casper.callbacks.OnMessageStatusChanged;
+import ru.olgathebest.casper.R;
+import ru.olgathebest.casper.model.StatusMsg;
+
 import static ru.olgathebest.casper.MessengerNDK.rsa;
-import static ru.olgathebest.casper.R.id.db;
 
 
 /**
@@ -94,10 +98,10 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
         if (!messageText.getText().toString().equals("")) {
             if (messengerNDK.isSecure(opponentUserId, currentUserId)) {
                 enc = rsa.encrypt(messageText.getText().toString(), new BigInteger(messengerNDK.getUserPublicKey(opponentUserId)));//messengerNDK.getUserPublicKey(opponentUserId));
-                encodedMsg = UTF8.encode(enc);
+                encodedMsg = Coding.encode(enc);
 
             } else
-                encodedMsg = UTF8.encode(messageText.getText().toString());
+                encodedMsg = Coding.encode(messageText.getText().toString());
             Message msg = new Message("1", opponentUserId, currentUserId, messageText.getText().toString(), new Date(), StatusMsg.Sending);
             msg.setType("0");
             messengerNDK.putMessage(msg);
@@ -109,7 +113,7 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
                 @Override
                 public void run() {
                     try {
-                        messengerNDK.nativeSend(UTF8.encode(opponentUserId), encodedMsg, 0);
+                        messengerNDK.nativeSend(Coding.encode(opponentUserId), encodedMsg, 0);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -158,7 +162,7 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
     ///////////////////////////////////CALLBACKS///////////////////////////////////////////////
     @Override
     public void onMessageSeen(Message msg) {
-        messengerNDK.nativeMessageSeen(UTF8.encode(msg.getFrom()), UTF8.encode(msg.getId()));
+        messengerNDK.nativeMessageSeen(Coding.encode(msg.getFrom()), Coding.encode(msg.getId()));
     }
 
     @Override
@@ -190,7 +194,7 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
     }
 
     public void sendPicture(String imgTransformed) {
-        encodedMsg = UTF8.hexToBytes(imgTransformed);
+        encodedMsg = Coding.hexToBytes(imgTransformed);
         Message msg = new Message("1", opponentUserId, currentUserId, imgTransformed, new Date(), StatusMsg.Sending);
         msg.setType("1");
         messengerNDK.putMessage(msg);
@@ -202,7 +206,7 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
             @Override
             public void run() {
                 try {
-                    messengerNDK.nativeSend(UTF8.encode(opponentUserId), encodedMsg, 1);
+                    messengerNDK.nativeSend(Coding.encode(opponentUserId), encodedMsg, 1);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -226,7 +230,7 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
         ByteArrayOutputStream buffer = new ByteArrayOutputStream(selectedImage.getWidth() * selectedImage.getHeight());
         selectedImage.compress(Bitmap.CompressFormat.PNG, 100, buffer);
         byte[] bits = buffer.toByteArray();
-        String text = UTF8.bytesToHex(bits);
+        String text = Coding.bytesToHex(bits);
         return text;
     }
 

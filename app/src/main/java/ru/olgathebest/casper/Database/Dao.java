@@ -1,7 +1,6 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.database;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -10,19 +9,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static android.R.attr.id;
-import static android.R.attr.name;
-import static android.content.ContentValues.TAG;
-import static ru.olgathebest.casper.DBHelper.KEY_CONTENT_MES;
-import static ru.olgathebest.casper.DBHelper.KEY_FROM;
-import static ru.olgathebest.casper.DBHelper.KEY_ID;
-import static ru.olgathebest.casper.DBHelper.KEY_ID_MES;
-import static ru.olgathebest.casper.DBHelper.KEY_STATUS_MES;
-import static ru.olgathebest.casper.DBHelper.KEY_TIMESTAMP;
-import static ru.olgathebest.casper.DBHelper.KEY_TO;
-import static ru.olgathebest.casper.DBHelper.KEY_TYPE;
-import static ru.olgathebest.casper.DBHelper.TABLE_NAME;
-import static ru.olgathebest.casper.R.string.email;
+import ru.olgathebest.casper.model.Message;
+import ru.olgathebest.casper.model.StatusMsg;
+
+import static ru.olgathebest.casper.database.DBHelper.KEY_CONTENT_MES;
+import static ru.olgathebest.casper.database.DBHelper.KEY_FROM;
+import static ru.olgathebest.casper.database.DBHelper.KEY_ID;
+import static ru.olgathebest.casper.database.DBHelper.KEY_ID_MES;
+import static ru.olgathebest.casper.database.DBHelper.KEY_STATUS_MES;
+import static ru.olgathebest.casper.database.DBHelper.KEY_TIMESTAMP;
+import static ru.olgathebest.casper.database.DBHelper.KEY_TO;
+import static ru.olgathebest.casper.database.DBHelper.KEY_TYPE;
+import static ru.olgathebest.casper.database.DBHelper.TABLE_NAME;
 
 /**
  * Created by Ольга on 10.12.2016.

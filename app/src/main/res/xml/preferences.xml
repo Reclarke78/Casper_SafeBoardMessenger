@@ -11,5 +11,5 @@
     <CheckBoxPreference android:title="Database"
         android:key="database"
         android:summary="Set database button visible"
-        android:text="@string/default_ip"></CheckBoxPreference>
+        ></CheckBoxPreference>
 </PreferenceScreen>

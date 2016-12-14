@@ -1,4 +1,4 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.utils;
 
 /**
  * Created by Ольга on 01.12.2016.
@@ -6,7 +6,7 @@ package ru.olgathebest.casper;
 
 import java.nio.charset.Charset;
 
-public class UTF8 {
+public class Coding {
     public static byte[] encode(String text) {
         return text.getBytes(UTF_8_CHARSET);
     }

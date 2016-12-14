@@ -1,4 +1,4 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.database;
 
 import android.content.Context;
 import android.database.Cursor;

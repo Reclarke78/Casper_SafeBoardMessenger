@@ -1,14 +1,8 @@
 package ru.olgathebest.casper;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -18,17 +12,22 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Observable;
-import java.util.Observer;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import ru.olgathebest.casper.activities.MainActivity;
+import ru.olgathebest.casper.callbacks.OnLogin;
+import ru.olgathebest.casper.callbacks.OnMessageReceived;
+import ru.olgathebest.casper.callbacks.OnMessageSeen;
+import ru.olgathebest.casper.callbacks.OnMessageStatusChanged;
+import ru.olgathebest.casper.callbacks.OnUserListChanged;
+import ru.olgathebest.casper.database.DBHelper;
+import ru.olgathebest.casper.database.Dao;
+import ru.olgathebest.casper.utils.AES;
+import ru.olgathebest.casper.utils.Coding;
+import ru.olgathebest.casper.utils.RSA;
+import ru.olgathebest.casper.model.Message;
+import ru.olgathebest.casper.model.StatusMsg;
 
-import static android.R.attr.key;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 import static android.media.CamcorderProfile.get;
-import static ru.olgathebest.casper.R.layout.login;
-import static ru.olgathebest.casper.R.layout.userslist;
 
 
 /**
@@ -77,16 +76,16 @@ public class MessengerNDK extends Service {
         Message message = null;
         Log.d("Type", ""+type);
         if (type==true){
-            mes = UTF8.bytesToHex(msg);
+            mes = Coding.bytesToHex(msg);
             message = new Message(identifier, currentUser, sender_id, mes, new Date(), StatusMsg.Delivered);
             message.setType("1");
             putMessage(message);
         } else {
 
             if (isSecure(currentUser, sender_id)&& type !=true)
-                mes = rsa.decrypt(UTF8.decode(msg));
+                mes = rsa.decrypt(Coding.decode(msg));
             else
-                mes = UTF8.decode(msg);
+                mes = Coding.decode(msg);
             Log.d("msg recieved", "from" + sender_id + " " + identifier);
             message = new Message(identifier, currentUser, sender_id, mes, new Date(), StatusMsg.Delivered);
             putMessage(message);
@@ -123,8 +122,8 @@ public class MessengerNDK extends Service {
             }
             start += len[i];
             startkey+=keylen[i];
-            userslist[i]=UTF8.decode(userId);
-            keylist[i] = UTF8.decode(userKey);
+            userslist[i]= Coding.decode(userId);
+            keylist[i] = Coding.decode(userKey);
         }
         for (int i = 0; i < onUserListChanged.size(); i++) {
             onUserListChanged.get(i).onUserListChanged(userslist, keylist);
@@ -132,7 +131,7 @@ public class MessengerNDK extends Service {
     }
 
     public void onMessageStatusChanged(byte[] msgIdArr, int status) {
-        final String msgId = UTF8.decode(msgIdArr);
+        final String msgId = Coding.decode(msgIdArr);
         int flag = 0;
         for (int i = 0; i < messages.size(); i++) {
             if (messages.get(i).getId().equals(msgId)) {
@@ -172,7 +171,9 @@ public class MessengerNDK extends Service {
     }
 
     public boolean isSecure(String opponentUserId, String currentUserId){
+        if (messengerNDK.getUserPublicKey(opponentUserId) != null && messengerNDK.getUserPublicKey(currentUserId)!=null)
         return (messengerNDK.getUserPublicKey(opponentUserId).length() > 1 && messengerNDK.getUserPublicKey(currentUserId).length() > 1);
+        else return false;
     }
     ////////////////////////////NATIVE/////////////////////////////////
 

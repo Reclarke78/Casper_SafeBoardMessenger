@@ -1,4 +1,4 @@
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.activities;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -11,31 +11,25 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.os.Message;
 
-import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Arrays;
 
-import static android.R.attr.button;
-import static android.R.attr.password;
-import static javax.crypto.Cipher.PUBLIC_KEY;
+import ru.olgathebest.casper.database.AndroidDatabaseManager;
+import ru.olgathebest.casper.utils.EmailValidator;
+import ru.olgathebest.casper.MessengerNDK;
+import ru.olgathebest.casper.callbacks.OnLogin;
+import ru.olgathebest.casper.R;
+import ru.olgathebest.casper.utils.Coding;
 
 public class MainActivity extends Activity implements OnLogin {
     private EditText loginField;
@@ -76,8 +70,6 @@ public class MainActivity extends Activity implements OnLogin {
         SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 //        Intent i = new Intent(this, MyPreferencesActivity.class);
 //        startActivity(i);
-
-
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -152,7 +144,7 @@ public class MainActivity extends Activity implements OnLogin {
                             String str = keyb.toString();
                             key = str.getBytes();
 
-                        messengerNDK.nativeLogin(UTF8.encode(login), UTF8.encode(pass), key);
+                        messengerNDK.nativeLogin(Coding.encode(login), Coding.encode(pass), key);
                     } catch (Throwable e) {
                         e.printStackTrace();
                     }

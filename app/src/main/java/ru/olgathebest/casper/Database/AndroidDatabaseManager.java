@@ -1,5 +1,5 @@
 //add your package name here example: package com.example.dbm;
-package ru.olgathebest.casper;
+package ru.olgathebest.casper.database;
 //all required import files
 import java.util.ArrayList;
 import java.util.LinkedList;
