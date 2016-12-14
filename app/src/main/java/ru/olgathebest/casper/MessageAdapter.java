@@ -94,6 +94,7 @@ public class MessageAdapter extends BaseAdapter {
         ImageView image = (ImageView) convertView.findViewById(R.id.imgMessage);
         TextView txtMessage = (TextView) convertView.findViewById(R.id.txtMessage);
         TextView txtInfo = (TextView) convertView.findViewById(R.id.txtInfo);
+        TextView txtStatus = (TextView) convertView.findViewById(R.id.txtStatus);
         if (type.equals("1")) {
             byte[] bits = UTF8.hexToBytes(messages.get(i).first.getText());
             Log.d("imageadd", bits.length + "");
@@ -103,6 +104,8 @@ public class MessageAdapter extends BaseAdapter {
             txtMessage.setText("");
             SimpleDateFormat dt = new SimpleDateFormat("HH:mm");
             txtInfo.setText(dt.format(messages.get(i).first.getTime()));
+            if (messages.get(i).first.getStatus()!=null&& txtStatus!=null )
+            txtStatus.setText(messages.get(i).first.getStatus().toString());
         } else {
             image.setImageBitmap(null);
             txtMessage.setText(message);
@@ -110,12 +113,15 @@ public class MessageAdapter extends BaseAdapter {
             txtInfo.setText(dt.format(messages.get(i).first.getTime()));
         }
         RelativeLayout msgBackground = (RelativeLayout) convertView.findViewById(R.id.content);
-        if (messages.get(i).first.getStatus() == StatusMsg.Seen) {
-            msgBackground.setBackgroundColor(Color.parseColor("#F7F7F7"));
-        }
         if (messages.get(i).first.getStatus() == StatusMsg.Delivered) {
             msgBackground.setBackgroundColor(Color.parseColor("#B6D0D2"));
+            txtStatus.setText("Delivered");
         }
+        if (messages.get(i).first.getStatus() == StatusMsg.Seen) {
+            msgBackground.setBackgroundColor(Color.parseColor("#F7F7F7"));
+            txtStatus.setText("Seen");
+        }
+
 
         return convertView;
     }

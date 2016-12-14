@@ -17,9 +17,6 @@ shared_ptr<IMessenger> i_mes;
 
 vector<unsigned char> getPublicKey();
 
-
-promise<UserList> user_list;
-
 string text_mes = "no";
 int code_result = 0;
 

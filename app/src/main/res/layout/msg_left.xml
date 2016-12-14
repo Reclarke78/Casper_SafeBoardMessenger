@@ -33,7 +33,17 @@
                 android:layout_height="wrap_content"
                 android:maxWidth="240dp"
                 />
+
         </LinearLayout>
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="30sp"
+            android:layout_toRightOf="@id/contentWithBackground"
+            android:layout_marginLeft="5dp"
+            android:textSize="12sp"
+            android:text="Sending..."
+            android:textColor="@android:color/darker_gray" />
         <TextView
             android:id="@+id/txtInfo"
             android:layout_width="wrap_content"
@@ -44,5 +54,6 @@
             android:textSize="12sp"
             android:text="time"
             android:textColor="@android:color/darker_gray" />
+
     </RelativeLayout>
 </RelativeLayout>

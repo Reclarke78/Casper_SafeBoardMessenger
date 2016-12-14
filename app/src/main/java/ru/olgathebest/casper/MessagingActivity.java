@@ -219,8 +219,8 @@ public class MessagingActivity extends Activity implements OnMessageSeen, OnMess
         }
         selectedImage = BitmapFactory.decodeStream(imageStream);
         selectedImage = Bitmap.createScaledBitmap(selectedImage,
-                150,
-                150,
+                100,
+                100,
                 true
         );
         ByteArrayOutputStream buffer = new ByteArrayOutputStream(selectedImage.getWidth() * selectedImage.getHeight());

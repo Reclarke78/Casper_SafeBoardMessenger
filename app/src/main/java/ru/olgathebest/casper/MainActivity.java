@@ -41,7 +41,7 @@ public class MainActivity extends Activity implements OnLogin {
     private String pass = "bad girl";
     public static final String PUBLIC_KEY = "Public Key";
     MessengerNDK messengerNDK = MessengerNDK.getMessengerNDK();
-    private String serverUrl = "192.168.1.7";//"195.123.211.113";//"192.168.1.2";//"172.20.10.5"; //"93.188.161.205"
+    private String serverUrl = "93.188.161.205";//"195.123.211.113";//"192.168.1.2";//"172.20.10.5"; //"93.188.161.205"
     private int serverPort = 5222;
     private ProgressDialog pd;
     private EmailValidator emailValidator = new EmailValidator();

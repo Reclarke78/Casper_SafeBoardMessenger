@@ -2,19 +2,18 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/logout"
-        android:id="@+id/logoutButton"
-        android:gravity="center_vertical|center_horizontal"
-        android:layout_gravity="center_horizontal"
-        android:background="@color/main_color_green"
-        android:textSize="24sp"
-        android:padding="15dp"
-        android:textColor="@color/main_color_gray_dk"
-        android:onClick="disconnect"/>
+    <!--<Button-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/logout"-->
+        <!--android:id="@+id/logoutButton"-->
+        <!--android:gravity="center_vertical|center_horizontal"-->
+        <!--android:layout_gravity="center_horizontal"-->
+        <!--android:background="@color/main_color_green"-->
+        <!--android:textSize="24sp"-->
+        <!--android:padding="15dp"-->
+        <!--android:textColor="@color/main_color_gray_dk"-->
+        <!--android:onClick="disconnect"/>-->
     <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -27,7 +26,6 @@
         android:padding="15dp"
         android:textColor="@color/main_color_gray_dk"
         android:onClick="userlist"/>
-
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

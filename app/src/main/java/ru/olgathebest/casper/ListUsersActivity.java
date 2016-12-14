@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static android.R.id.list;
+import static android.view.View.Z;
 import static ru.olgathebest.casper.R.id.src_over;
 import static ru.olgathebest.casper.R.id.user;
 import static ru.olgathebest.casper.R.id.users;
