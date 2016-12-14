@@ -47,7 +47,7 @@ public class MessengerNDK extends Service {
     private static DBHelper dbHelper;
     private static Dao dao;
 
-    private HashMap<String, String> users;
+    private HashMap<String, String> users = new HashMap<>();
     private ArrayList<Message> messages = new ArrayList<>();
 
     private ArrayList<OnUserListChanged> onUserListChanged = new ArrayList<>();
@@ -203,7 +203,10 @@ public class MessengerNDK extends Service {
     }
 
     public String getUserPublicKey(String login) {
+        if (users != null)
         return users.get(login);
+        else
+            return "";
     }
 
     public void setIdOfSentMsg(long id) {

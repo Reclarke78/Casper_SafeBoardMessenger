@@ -115,10 +115,12 @@ public class MessageAdapter extends BaseAdapter {
         RelativeLayout msgBackground = (RelativeLayout) convertView.findViewById(R.id.content);
         if (messages.get(i).first.getStatus() == StatusMsg.Delivered) {
             msgBackground.setBackgroundColor(Color.parseColor("#B6D0D2"));
+            if (txtStatus!=null )
             txtStatus.setText("Delivered");
         }
         if (messages.get(i).first.getStatus() == StatusMsg.Seen) {
             msgBackground.setBackgroundColor(Color.parseColor("#F7F7F7"));
+            if (txtStatus!=null )
             txtStatus.setText("Seen");
         }
 

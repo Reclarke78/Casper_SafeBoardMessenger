@@ -2,7 +2,6 @@ package ru.olgathebest.casper;
 
 import java.util.Date;
 
-import static ru.olgathebest.casper.R.string.to;
 
 /**
  * Created by Ольга on 08.12.2016.

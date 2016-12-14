@@ -7,15 +7,20 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -28,6 +33,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import static android.R.attr.button;
 import static android.R.attr.password;
 import static javax.crypto.Cipher.PUBLIC_KEY;
 
@@ -44,7 +50,9 @@ public class MainActivity extends Activity implements OnLogin {
     private String serverUrl = "93.188.161.205";//"195.123.211.113";//"192.168.1.2";//"172.20.10.5"; //"93.188.161.205"
     private int serverPort = 5222;
     private ProgressDialog pd;
+    Button db;
     private EmailValidator emailValidator = new EmailValidator();
+    SharedPreferences SP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +61,10 @@ public class MainActivity extends Activity implements OnLogin {
         setContentView(R.layout.login);
         loginField = (EditText) findViewById(R.id.user);
         passField = (EditText) findViewById(R.id.pwd);
-        Button button = (Button) findViewById(R.id.db);
+        db = (Button) findViewById(R.id.db);
         isSecureCheckBox = (CheckBox) findViewById(R.id.security);
 
-        button.setOnClickListener(new View.OnClickListener() {
+        db.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 Intent dbmanager = new Intent(getApplicationContext(), AndroidDatabaseManager.class);
@@ -65,13 +73,41 @@ public class MainActivity extends Activity implements OnLogin {
         });
         messengerNDK.setContext(getApplicationContext());
         messengerNDK.setMainActivity(this);
-    }
+        SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//        Intent i = new Intent(this, MyPreferencesActivity.class);
+//        startActivity(i);
 
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_settings:
+                //Toast.makeText(this, "ADD!", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(this, MyPreferencesActivity.class);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
     @Override
     public void onStart() {
         super.onStart();
         startService(new Intent(this, MessengerNDK.class));
         messengerNDK.addOnLogin(this);
+        serverUrl = SP.getString("ip","192.168.1.2");
+        serverPort = Integer.parseInt(SP.getString("port","5222"));
+        if (SP.getBoolean("database",false))
+            db.setVisibility(View.VISIBLE);
+        else
+            db.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -171,7 +207,7 @@ public class MainActivity extends Activity implements OnLogin {
         Resources res = context.getResources();
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setContentIntent(contentIntent)
-                .setSmallIcon(R.drawable.logo_login)
+                .setSmallIcon(R.drawable.ic_launcher)
                 .setTicker(name + ": " + ((str.length() < 30) ? str : (str.substring(0, 30) + "...")))
                 .setAutoCancel(true)
                 .setContentTitle(name)

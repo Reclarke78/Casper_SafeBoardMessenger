@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference android:title="Port"
+        android:key="port"
+        android:summary="Please enter server port"
+        android:text="@string/default_port"></EditTextPreference>
+    <EditTextPreference android:title="IP"
+        android:key="ip"
+        android:summary="Please enter server ip"
+        android:text="@string/default_ip"></EditTextPreference>
+    <CheckBoxPreference android:title="Database"
+        android:key="database"
+        android:summary="Set database button visible"
+        android:text="@string/default_ip"></CheckBoxPreference>
+</PreferenceScreen>
